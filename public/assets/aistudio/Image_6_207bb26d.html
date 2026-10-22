@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-bright": "#f5faff", "outline": "#6c7a74", "on-tertiary-container": "#003513", "on-primary-fixed-variant": "#00513e", "on-secondary": "#ffffff", "primary-fixed-dim": "#59dcb5", "surface-container-high": "#dfeaf2", "surface-dim": "#d1dbe4", "secondary": "#1c695f", "outline-variant": "#bccac2", "on-surface": "#131d23", "on-tertiary-fixed": "#002109", "background": "#f5faff", "secondary-fixed": "#a8f0e3", "primary-fixed": "#79f9d0", "on-error": "#ffffff", "error": "#ba1a1a", "surface": "#f5faff", "on-primary-container": "#003427", "secondary-container": "#a5ede0", "primary": "#006b53", "surface-container-highest": "#d9e4ec", "primary-container": "#00a884", "secondary-fixed-dim": "#8cd4c7", "on-background": "#131d23", "surface-variant": "#d9e4ec", "on-secondary-fixed-variant": "#005047", "error-container": "#ffdad6", "inverse-on-surface": "#e8f2fb", "on-primary-fixed": "#002117", "surface-container-low": "#eaf5fe", "surface-container-lowest": "#ffffff", "on-error-container": "#93000a", "on-secondary-fixed": "#00201c", "on-primary": "#ffffff", "surface-container": "#e5eff8", "on-tertiary-fixed-variant": "#005322", "on-tertiary": "#ffffff", "tertiary-fixed-dim": "#3de273", "inverse-surface": "#283238", "on-secondary-container": "#226e63", "on-surface-variant": "#3d4a44", "tertiary": "#006d2f", "inverse-primary": "#59dcb5", "surface-tint": "#006b53", "tertiary-fixed": "#66ff8e", "tertiary-container": "#00ab4e" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-sm": "0.5rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "gutter-lg": "1.5rem", "margin-lg": "1.5rem", "space-md": "1rem", "space-xs": "0.25rem", "margin": "1rem", "margin-sm": "0.75rem", "gutter": "1rem", "space-xl": "2rem" }, "fontFamily": { "body-sm": ["Roboto Flex"], "headline-lg": ["Roboto Flex"], "title-lg": ["Roboto Flex"], "headline-lg-mobile": ["Roboto Flex"], "body-md": ["Roboto Flex"], "label-sm": ["Roboto Flex"], "body-lg": ["Roboto Flex"], "label-md": ["Roboto Flex"], "headline-sm": ["Roboto Flex"], "label-lg": ["Roboto Flex"], "title-md": ["Roboto Flex"], "headline-md": ["Roboto Flex"] }, "fontSize": { "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "title-lg": ["16px", { "lineHeight": "22px", "fontWeight": "600" }], "headline-lg-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }], "body-md": ["14.5px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "400" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "title-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface-container-lowest font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-6 px-margin flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm"><span>12:30</span><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">wifi</span><span class="material-symbols-outlined text-[15px]">signal_cellular_alt</span><span class="font-label-sm text-label-sm font-medium">85%</span><span class="material-symbols-outlined text-[15px]">battery_full</span></div></div><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="TrackView Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKK4s12E2rIvPeCpON-H1dSTZhvMVU44aqKfFe9LGAje8GCiVe6-KPWHzX162q19oZ9dBRNFTfFdUpsREZZOcfGPlA5EDFmQCEBRG8sQWXC2BwZseOiySRZhhiw6VzAP4ElrEQWtZFRvh1SSD5OGnzUFpy75YHQHZeHuVqcn52nSrUs620mNrHXZgaIxJv-9XXq0Sxx9QptSk4oZvWbtULlTac2TtXlfNCa-B8Znd8aWSjf1lcXLza"/><span class="font-headline-sm text-headline-sm text-primary-container tracking-tight">TrackView</span><span class="sr-only">Live Map</span></div><div class="flex items-center gap-space-xs"><button aria-label="Camera" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[24px]">photo_camera</span></button><button aria-label="Search" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[24px]">search</span></button><button aria-label="More options" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[24px]">more_vert</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-xs"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface-container-lowest min-h-screen"><div class="flex flex-col w-full relative">
+<!-- Interactive Viewport Canvas -->
+<div class="relative w-full h-[580px] overflow-hidden bg-surface-container select-none">
+<!-- Map Texture Background Pipeline -->
+<div class="absolute inset-0 w-full h-full bg-cover bg-center" data-location="Lincoln Park, Chicago, IL" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAHj10GSswJRDUMIMW9caBD1MhyclegrqJEYlGfVNqvG7sEGZJsylt49dV8_sfjlKzG6yHcz_-6hovcLYfeFPIWd74jZpEkX3vOYXT9u8Q32etmPUhvnMl1E__fncPjnVGRpZq3OngsxSE2faElLzmpefT1Mwy0cue4UlCG5DfyKHkZ8zzGAza5CFU2CTPZzUDGbXiLBQtwpG7ktqPzGlVBWIOf9J59511rlj1V-mudQB8wH91cGOBm')"></div>
+<!-- Soft Cartographic Aesthetic Tint / Vector Roads Overlay -->
+<div class="absolute inset-0 bg-primary/5 pointer-events-none mix-blend-multiply"></div>
+<!-- SafeZone Geofence 1: Home SafeZone (Translucent Emerald Circular Field) -->
+<div class="absolute top-[38%] left-[16%] -translate-x-1/2 -translate-y-1/2 w-44 h-44 rounded-full bg-tertiary-container/15 flex items-center justify-center pointer-events-none shadow-sm">
+<div class="w-36 h-36 rounded-full bg-tertiary-container/10 flex items-end justify-center pb-2">
+<span class="font-label-sm text-label-sm text-on-tertiary-container bg-surface-container-lowest/90 px-2 py-0.5 rounded-full shadow-sm font-medium">Home SafeZone</span>
+</div>
+</div>
+<!-- SafeZone Geofence 2: Lincoln High SafeZone -->
+<div class="absolute top-[22%] right-[10%] -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full bg-secondary-container/20 flex items-center justify-center pointer-events-none shadow-sm">
+<div class="w-36 h-36 rounded-full bg-secondary-container/15 flex items-start justify-center pt-2">
+<span class="font-label-sm text-label-sm text-on-secondary-container bg-surface-container-lowest/90 px-2 py-0.5 rounded-full shadow-sm font-medium">Lincoln High SafeZone</span>
+</div>
+</div>
+<!-- Floating Top Search & Quick Access Bar -->
+<div class="absolute top-3 left-4 right-4 z-20">
+<div class="w-full bg-surface-container-lowest/95 backdrop-blur-md rounded-full shadow-md flex items-center px-4 py-2.5 gap-2">
+<span class="material-symbols-outlined text-primary-container text-[22px]">search</span>
+<input class="w-full bg-transparent font-body-sm text-body-sm text-on-surface placeholder:text-outline outline-none min-w-0" placeholder="Search address or family member..." type="text"/>
+<button aria-label="Voice Search" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</button>
+<button aria-label="Filters" class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-secondary-container transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+<!-- Real-time Consent & GPS Freshness Chip -->
+<div class="flex items-center gap-1.5 mt-2 ml-2">
+<div class="bg-surface-container-lowest/90 backdrop-blur-sm rounded-full shadow-sm px-2.5 py-1 flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">GPS Active • Mutual Consent Verified</span>
+</div>
+</div>
+</div>
+<!-- Live Map Marker 1: Sarah (Moving with radiating pulse) -->
+<div class="absolute top-[62%] left-[48%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center cursor-pointer group">
+<!-- Radiating concentric live glow -->
+<div class="relative flex items-center justify-center">
+<div class="absolute w-14 h-14 rounded-full bg-tertiary-container/30 animate-ping"></div>
+<div class="absolute w-12 h-12 rounded-full bg-tertiary-container/20"></div>
+<div class="w-10 h-10 rounded-full bg-primary-container p-0.5 shadow-md flex items-center justify-center">
+<img class="w-full h-full rounded-full object-cover" data-alt="Portrait photo of Sarah Miller smiling warmly with auburn hair in soft natural daylight, high resolution modern avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnSlIKEoFEU70O4gCGNidrLlfazv0cx0dpBRutWnb7WxfStbNlMpEUh2KLzdVRFRCB5XvOzkObFqLtJMVeHdtkrIntF9mnDWz_cT9UQywyXYOTea-e3Ux7FhlLjKJXwGQz5k3AEuFBnCvdxW_NDqgUY7k1ypHxdc81TcbePKiVKhimbp8BMVtGwCforSlPsCoGI9YoFlBidQOBzeknQFunwl_UMt2_plCqSt7FHoFKB8YcBcUQgeuY"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-tertiary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-on-tertiary text-[10px]">navigation</span>
+</div>
+</div>
+<!-- Floating Label Banner -->
+<div class="mt-1 bg-surface-container-lowest/95 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md flex items-center gap-1.5 whitespace-nowrap">
+<span class="font-title-md text-title-md text-on-surface font-semibold">Sarah</span>
+<span class="font-label-sm text-label-sm text-primary-container font-medium">24 mph</span>
+<span class="text-outline-variant">•</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">4m ago</span>
+</div>
+</div>
+<!-- Live Map Marker 2: Lucas (Stationary at school) -->
+<div class="absolute top-[24%] right-[22%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center cursor-pointer">
+<div class="relative flex items-center justify-center">
+<div class="w-9 h-9 rounded-full bg-secondary p-0.5 shadow-md flex items-center justify-center">
+<img class="w-full h-full rounded-full object-cover" data-alt="Casual portrait avatar of teenage boy Lucas wearing a hoodie outdoors under clear sky" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO-kZpMkXhqpkbLzUSSyaHuzvyq4ZMVmbXe0l7ipKleocBUGLYpRVlY20d-Tz2TUkB-a4NXEELUIDra9ldWHFAY4O557bQNJvPb9zAYsREjasC1xauYhROQGPAK48ZPbnfUOFohm-crkl-pxoTt8Ri_DSTERqjvCqkya1Wm9Qz9wVCkD3Feh60V4A8--Weo9TstF13Irz1N_GkoDJjOm0VzWgnvGyPCshmzAzRwnu_TUIVfSDM-SAC"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-secondary-fixed flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-on-secondary-fixed text-[9px]">school</span>
+</div>
+</div>
+<div class="mt-1 bg-surface-container-lowest/95 backdrop-blur-md px-2.5 py-0.5 rounded-full shadow-md flex items-center gap-1.5 whitespace-nowrap">
+<span class="font-title-md text-title-md text-on-surface font-medium">Lucas</span>
+<span class="text-outline-variant">•</span>
+<span class="material-symbols-outlined text-tertiary text-[13px]">battery_5_bar</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">91%</span>
+</div>
+</div>
+<!-- Live Map Marker 3: You (Home with directional beam) -->
+<div class="absolute top-[38%] left-[20%] -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center cursor-pointer">
+<div class="relative flex items-center justify-center">
+<!-- Viewing Directional Cone Beam (SVG) -->
+<svg class="absolute -top-6 w-16 h-14 pointer-events-none text-secondary/25" fill="currentColor" viewbox="0 0 64 56">
+<polygon opacity="0.6" points="32,48 4,0 60,0"></polygon>
+</svg>
+<div class="w-7 h-7 rounded-full bg-secondary-container p-1 shadow-md flex items-center justify-center">
+<div class="w-full h-full rounded-full bg-secondary shadow-inner"></div>
+</div>
+</div>
+<div class="mt-1 bg-surface-container-lowest/95 backdrop-blur-md px-2 py-0.5 rounded-full shadow-md flex items-center gap-1">
+<span class="font-title-md text-title-md text-on-surface font-semibold">You</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium">• Home</span>
+</div>
+</div>
+<!-- Right-Hand Map Action Hub (WhatsApp / Material 3 floating controls) -->
+<div class="absolute right-4 bottom-6 z-20 flex flex-col items-center gap-3">
+<!-- Secondary Layer Toggles Container -->
+<div class="bg-surface-container-lowest/95 backdrop-blur-md rounded-2xl shadow-md p-1.5 flex flex-col gap-1">
+<!-- Satellite / Map Mode -->
+<button aria-label="Toggle Satellite Imagery" class="w-11 h-11 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors" id="toggle-satellite" type="button">
+<span class="material-symbols-outlined text-[22px]">layers</span>
+</button>
+<!-- Live Traffic Toggle -->
+<button aria-label="Toggle Traffic Conditions" class="w-11 h-11 rounded-xl flex items-center justify-center text-primary-container bg-surface-container-low hover:bg-surface-container-high transition-colors" id="toggle-traffic" type="button">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">traffic</span>
+</button>
+<!-- SafeZone / Geofence Boundary Visibility Toggle -->
+<button aria-label="Toggle Geofence Boundaries" class="w-11 h-11 rounded-xl flex items-center justify-center text-tertiary-container bg-surface-container-low hover:bg-surface-container-high transition-colors" id="toggle-geofence" type="button">
+<span class="material-symbols-outlined text-[22px]">shield</span>
+</button>
+</div>
+<!-- Emerald Recenter on My Location Primary FAB -->
+<button aria-label="Recenter Map on Current Location" class="w-14 h-14 rounded-full bg-primary-container text-on-primary shadow-lg flex items-center justify-center hover:opacity-95 active:scale-95 transition-all" id="recenter-fab" type="button">
+<span class="material-symbols-outlined text-[26px]">my_location</span>
+</button>
+</div>
+</div>
+<!-- WhatsApp Inspired Draggable Family Sharing Bottom Sheet -->
+<div class="w-full bg-surface-container-lowest rounded-t-3xl shadow-xl flex flex-col relative -mt-4 z-30 pt-3 pb-8">
+<!-- Centered Drag Handle Pill -->
+<div class="w-full flex justify-center py-1 cursor-grab active:cursor-grabbing">
+<div class="w-10 h-1 bg-outline-variant rounded-full"></div>
+</div>
+<!-- Sheet Header with Mutual Safeguard Trigger -->
+<div class="px-margin pt-2 pb-3 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Family Sharing</h2>
+<span class="bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold px-2 py-0.5 rounded-full">3 active</span>
+</div>
+<button class="px-3 py-1.5 rounded-full bg-error-container text-on-error-container flex items-center gap-1.5 hover:bg-error hover:text-on-error transition-all active:scale-95" id="stop-sharing-btn" type="button">
+<span class="material-symbols-outlined text-[15px]">stop_circle</span>
+<span class="font-label-md text-label-md font-semibold">Stop All Sharing</span>
+</button>
+</div>
+<!-- Family Members Activity List -->
+<div class="flex flex-col px-margin gap-2.5">
+<!-- Member 1: Sarah Miller (Active Transit) -->
+<div class="bg-surface-container-low rounded-2xl p-3 flex flex-col gap-2.5 shadow-sm transition-all hover:bg-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative w-12 h-12 flex-shrink-0">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="Close-up portrait of Sarah Miller wearing casual green jacket with city background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_G7cuZ1r52F06ciRqIhTlCpNbW_kdMGXApr4wxcRNhQhqfcaorMNMlP18g2Fd_oS1Zgxfw7BfcUVLlepvDPyeadki9nuTMRGxr6b2H3IUFqvQlA0LKYAV5N4ncNLQCaT1EAxktJvyjClNlthCv-PFiHS8uO8ZtsbrWfUa8WUXtUBC5CwYOAXy0tLafNLvRIYr6MvbqenxHe0-vl0bqiZZlhIYhGOKfQlhCxundTcLBSK-PR1nBWad"/>
+<div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-tertiary-container flex items-center justify-center ring-2 ring-surface-container-lowest">
+<span class="material-symbols-outlined text-on-tertiary text-[11px]">directions_car</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-title-lg text-title-lg text-on-surface truncate">Sarah Miller</span>
+<span class="font-label-sm text-label-sm text-primary-container bg-surface-container-lowest px-1.5 py-0.2 rounded-full font-medium">Live</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Moving along Grand Ave • 8 min ETA</p>
+</div>
+</div>
+<!-- Battery Pill -->
+<div class="flex items-center gap-1 bg-surface-container-lowest px-2 py-1 rounded-full text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[16px]">battery_5_bar</span>
+<span class="font-label-sm text-label-sm font-medium">82%</span>
+</div>
+</div>
+<!-- Quick Interaction Actions -->
+<div class="flex items-center gap-2 pt-0.5">
+<button class="flex-1 py-1.5 px-3 rounded-full bg-primary-container text-on-primary font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm hover:opacity-90 transition-opacity" type="button">
+<span class="material-symbols-outlined text-[16px]">directions</span>
+<span>Directions</span>
+</button>
+<button class="flex-1 py-1.5 px-3 rounded-full bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm hover:bg-surface-container-high transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">call</span>
+<span>Call</span>
+</button>
+<button aria-label="Sarah Quick Options" class="w-9 h-9 rounded-full bg-surface-container-lowest text-on-surface-variant flex items-center justify-center shadow-sm hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Member 2: Lucas Miller (Stationary at SafeZone) -->
+<div class="bg-surface-container-low rounded-2xl p-3 flex flex-col gap-2.5 shadow-sm transition-all hover:bg-surface-container">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative w-12 h-12 flex-shrink-0">
+<img class="w-12 h-12 rounded-full object-cover shadow-sm" data-alt="Portrait photo avatar of teenage student Lucas Miller outdoors in daytime" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeapTaKI1LSp0h2zjvX47edbd27duUYy_7MdKJLyyz-Pi5_YDB8xkKpD4_AqMo-6XMSf9YL99a9-F-WckN333zwaeQpziJxIqzwgTp-eygqdybOCy-ClkepnQZUlYu2fdXHCzlF4Bwd1zuVfEQvRqRK-LdJOHUiq3Mp5b-cjTUArAjkNJbWCuMiz1M-eVB5-vP4ijVyAcFETsipvSpW2elmqNyQJgXWS5D5r2PKJAuSngJfhXEhHux"/>
+<div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-secondary flex items-center justify-center ring-2 ring-surface-container-lowest">
+<span class="material-symbols-outlined text-on-secondary text-[11px]">apartment</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-lg text-title-lg text-on-surface truncate">Lucas Miller</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">At School (since 8:15 AM)</p>
+</div>
+</div>
+<!-- Battery Level -->
+<div class="flex items-center gap-1 bg-surface-container-lowest px-2 py-1 rounded-full text-on-surface-variant">
+<span class="material-symbols-outlined text-tertiary text-[16px]">battery_6_bar</span>
+<span class="font-label-sm text-label-sm font-medium">91%</span>
+</div>
+</div>
+<!-- SafeZone Departure Alert Switch -->
+<div class="flex items-center justify-between bg-surface-container-lowest px-3 py-2 rounded-xl">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">notifications_active</span>
+<span class="font-body-sm text-body-sm text-on-surface">Notify on school departure</span>
+</div>
+<!-- Toggle Pill -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-9 h-5 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface-container-lowest after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+<!-- Member 3: Emma Miller (Ghost Mode / Privacy Conscious State) -->
+<div class="bg-surface-container-low/70 rounded-2xl p-3 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3 min-w-0">
+<div class="relative w-12 h-12 flex-shrink-0 opacity-75">
+<img class="w-12 h-12 rounded-full object-cover grayscale" data-alt="Portrait photography avatar of young woman Emma Miller with light background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLjoJLMN11r9RFQj0kJ8CYiL9vBj_LT8ENpsThJi1LKplLTBF55utwnuO7v11djkvY5s1HUGyhyHxWKDAJ8rqCOb7TQrFxCOEZm4VU0MYClhfyfCVCLk-tJfHbB4g2obAFE1wgcNbDksTmFUuji4r_vmzci8mw4vc2jGZzLzjbpQMwEBojJ1KGxaxj9wz714tksSsZRZfyBVY3g-MBLEDWAcYgXzeicHJ9VeqZenbU5PpKZQMGsGzd"/>
+<div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-outline flex items-center justify-center ring-2 ring-surface-container-lowest">
+<span class="material-symbols-outlined text-on-primary text-[10px]">visibility_off</span>
+</div>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-title-lg text-title-lg text-on-surface truncate">Emma Miller</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-highest px-1.5 py-0.2 rounded-full">Ghost Mode</span>
+</div>
+<p class="font-body-sm text-body-sm text-outline truncate">Sharing paused • Last seen 2h ago</p>
+</div>
+</div>
+<button class="py-1 px-3 rounded-full bg-surface-container-highest text-on-surface-variant font-label-sm text-label-sm font-medium hover:bg-surface-container-high transition-colors" type="button">
+          Request
+        </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Micro-interaction handlers for Map Quick Toggles & Safeguards
+  document.addEventListener('DOMContentLoaded', () => {
+    const recenterBtn = document.getElementById('recenter-fab');
+    if (recenterBtn) {
+      recenterBtn.addEventListener('click', () => {
+        recenterBtn.classList.add('rotate-45');
+        setTimeout(() => recenterBtn.classList.remove('rotate-45'), 350);
+      });
+    }
+
+    const stopSharingBtn = document.getElementById('stop-sharing-btn');
+    if (stopSharingBtn) {
+      stopSharingBtn.addEventListener('click', () => {
+        const confirmPause = confirm('Pause all live location broadcasting across family channels?');
+        if (confirmPause) {
+          stopSharingBtn.innerHTML = '<span class="material-symbols-outlined text-[15px]">check</span><span>Sharing Paused</span>';
+          stopSharingBtn.classList.replace('bg-error-container', 'bg-surface-container-highest');
+          stopSharingBtn.classList.replace('text-on-error-container', 'text-outline');
+        }
+      });
+    }
+
+    const satelliteToggle = document.getElementById('toggle-satellite');
+    if (satelliteToggle) {
+      satelliteToggle.addEventListener('click', () => {
+        satelliteToggle.classList.toggle('text-primary-container');
+        satelliteToggle.classList.toggle('bg-surface-container-high');
+      });
+    }
+  });
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="[&amp;&gt;div]:bg-secondary-container [&amp;&gt;div]:text-on-secondary-container text-on-surface font-label-md"><div class="flex justify-around items-center h-16 px-gutter-sm"><a class="flex flex-col items-center justify-center gap-1 w-16 h-14 text-on-surface-variant hover:text-on-surface" data-path="chats" href="#"><div class="relative px-4 py-1 rounded-full flex items-center justify-center transition-all"><span class="material-symbols-outlined text-[22px]">chat</span><span class="absolute -top-1 -right-1 bg-primary text-on-primary text-[10px] font-bold rounded-full h-4 min-w-[16px] px-1 flex items-center justify-center leading-none">3</span></div><span class="font-label-sm text-label-sm">Chats</span></a><a class="flex flex-col items-center justify-center gap-1 w-16 h-14 text-on-surface-variant hover:text-on-surface" data-path="updates" href="#"><div class="px-4 py-1 rounded-full flex items-center justify-center transition-all"><span class="material-symbols-outlined text-[22px]">update</span></div><span class="font-label-sm text-label-sm">Updates</span></a><a aria-current="page" class="flex flex-col items-center justify-center gap-1 w-16 h-14 [&amp;&gt;div]:bg-secondary-container [&amp;&gt;div]:text-on-secondary-container text-on-surface font-label-md" data-path="live-map" href="#"><div class="px-4 py-1 rounded-full flex items-center justify-center transition-all"><span class="material-symbols-outlined text-[22px]">radar</span></div><span class="font-label-sm text-label-sm">Map</span></a><a class="flex flex-col items-center justify-center gap-1 w-16 h-14 text-on-surface-variant hover:text-on-surface" data-path="calls" href="#"><div class="px-4 py-1 rounded-full flex items-center justify-center transition-all"><span class="material-symbols-outlined text-[22px]">call</span></div><span class="font-label-sm text-label-sm">Calls</span></a></div><div class="w-full flex justify-center pb-2"><div class="w-32 h-1 bg-on-surface-variant/30 rounded-full"></div></div></nav></body></html>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer family safety shield -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,24L30,34v18c0,16.5 10.2,31.8 24,36 13.8,-4.2 24,-19.5 24,-36V34L54,24z" />
+    <!-- Inner emerald radar pin cutout -->
+    <path
+        android:fillColor="#006B53"
+        android:pathData="M54,36c-7.7,0 -14,6.3 -14,14 0,9.5 14,22 14,22s14,-12.5 14,-22c0,-7.7 -6.3,-14 -14,-14z" />
+    <!-- Center radar core -->
+    <path
+        android:fillColor="#79F9D0"
+        android:pathData="M54,44c-3.3,0 -6,2.7 -6,6s2.7,6 6,6 6,-2.7 6,-6 -2.7,-6 -6,-6z" />
+</vector>

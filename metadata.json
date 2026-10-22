@@ -1,0 +1,6 @@
+{
+  "name": "TrackView",
+  "description": "Privacy-first family safety, live GPS location sharing, SafeZone geofence alerts, and parental controls with a familiar messaging interface.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

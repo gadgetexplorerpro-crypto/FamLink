@@ -1,0 +1,289 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated parent or family administrator profile and privacy preferences.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID" },
+        "displayName": { "type": "string", "description": "Display name of the user" },
+        "email": { "type": "string", "description": "Email address of the user" },
+        "avatarUrl": { "type": "string", "description": "Profile avatar URL" },
+        "statusMessage": { "type": "string", "description": "Availability status line" },
+        "ghostModeEnabled": { "type": "boolean", "description": "Emergency Ghost Mode kill-switch state" },
+        "shareBatteryStatus": { "type": "boolean", "description": "Whether battery telemetry is shared with family" },
+        "darkModeMapStyling": { "type": "boolean", "description": "Dark mode map preference" },
+        "speedUnit": { "type": "string", "enum": ["MPH", "KMH"], "description": "Speedometer unit preference" },
+        "planTier": { "type": "string", "enum": ["FREE", "PREMIUM_MONTHLY", "PREMIUM_ANNUAL"], "description": "Current subscription plan tier" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "displayName",
+        "email",
+        "avatarUrl",
+        "statusMessage",
+        "ghostModeEnabled",
+        "shareBatteryStatus",
+        "darkModeMapStyling",
+        "speedUnit",
+        "planTier",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "FamilyMember": {
+      "title": "FamilyMember",
+      "description": "Connected family member device with real-time GPS telemetry, parental controls, and chat metadata.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID" },
+        "name": { "type": "string", "description": "Family member display name" },
+        "role": { "type": "string", "enum": ["SPOUSE", "CHILD", "SIBLING", "GROUP", "BOT"], "description": "Member relationship or channel type" },
+        "avatarUrl": { "type": "string", "description": "Avatar photo URL" },
+        "online": { "type": "boolean", "description": "Whether device is currently online" },
+        "liveSharing": { "type": "boolean", "description": "Whether live GPS sharing stream is active" },
+        "pinned": { "type": "boolean", "description": "Whether conversation is pinned at top" },
+        "favorite": { "type": "boolean", "description": "Whether member is marked as favorite" },
+        "batteryLevel": { "type": "integer", "description": "Device battery percentage (0-100)" },
+        "speedMph": { "type": "integer", "description": "Current transit speed in MPH" },
+        "locationLabel": { "type": "string", "description": "Human-readable current location or SafeZone name" },
+        "lastMessageSnippet": { "type": "string", "description": "Latest chat or location status preview" },
+        "lastActivityTimeLabel": { "type": "string", "description": "Formatted timestamp for conversation list" },
+        "unreadCount": { "type": "integer", "description": "Unread message/update badge count" },
+        "screenTimeMinutesToday": { "type": "integer", "description": "Screen time used today in minutes" },
+        "screenTimeLimitMinutes": { "type": "integer", "description": "Daily screen time allowance in minutes" },
+        "latitude": { "type": "number", "description": "Last known GPS latitude" },
+        "longitude": { "type": "number", "description": "Last known GPS longitude" },
+        "accuracyMeters": { "type": "integer", "description": "GPS accuracy radius in meters" },
+        "notifyOnSchoolDeparture": { "type": "boolean", "description": "Geofence departure alert toggle" },
+        "ghostMode": { "type": "boolean", "description": "Whether member has paused location sharing" },
+        "appRestrictionsEnabled": { "type": "boolean", "description": "Whether parental app restrictions are enforced" },
+        "websiteSafetyEnabled": { "type": "boolean", "description": "Whether safe browsing filter is enabled" },
+        "bedtimeSchedule": { "type": "string", "description": "Configured bedtime schedule window" },
+        "pairingCode": { "type": "string", "description": "Device pairing code used to link member" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "name",
+        "role",
+        "avatarUrl",
+        "online",
+        "liveSharing",
+        "pinned",
+        "favorite",
+        "batteryLevel",
+        "speedMph",
+        "locationLabel",
+        "lastMessageSnippet",
+        "lastActivityTimeLabel",
+        "unreadCount",
+        "screenTimeMinutesToday",
+        "screenTimeLimitMinutes",
+        "latitude",
+        "longitude",
+        "accuracyMeters",
+        "notifyOnSchoolDeparture",
+        "ghostMode",
+        "appRestrictionsEnabled",
+        "websiteSafetyEnabled",
+        "bedtimeSchedule",
+        "pairingCode",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Encrypted family chat message or rich live location card.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID" },
+        "memberId": { "type": "string", "description": "Target family member document ID" },
+        "senderName": { "type": "string", "description": "Name of message sender" },
+        "outgoing": { "type": "boolean", "description": "True if sent by current user" },
+        "text": { "type": "string", "description": "Message body or location summary" },
+        "messageType": { "type": "string", "enum": ["TEXT", "LIVE_LOCATION", "STATIC_PIN", "VOICE_NOTE", "GEOFENCE_EVENT"], "description": "Message payload type" },
+        "timeLabel": { "type": "string", "description": "Formatted time label (e.g. 10:35 AM)" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "memberId",
+        "senderName",
+        "outgoing",
+        "text",
+        "messageType",
+        "timeLabel",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SafetyAlert": {
+      "title": "SafetyAlert",
+      "description": "Family safety notification for geofence arrivals/departures, battery, screen time, or SOS.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID" },
+        "memberName": { "type": "string", "description": "Name of family member associated with alert" },
+        "alertType": { "type": "string", "enum": ["ARRIVAL", "DEPARTURE", "OFFLINE", "LOW_BATTERY", "SCREEN_TIME", "BEDTIME", "EMERGENCY"], "description": "Category of safety alert" },
+        "title": { "type": "string", "description": "Alert headline" },
+        "description": { "type": "string", "description": "Detailed alert description" },
+        "timeLabel": { "type": "string", "description": "Formatted timestamp string" },
+        "read": { "type": "boolean", "description": "Whether alert has been marked read" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "memberName",
+        "alertType",
+        "title",
+        "description",
+        "timeLabel",
+        "read",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SafeZone": {
+      "title": "SafeZone",
+      "description": "Geofence saved place (e.g. Home, School, Soccer Academy) with arrival/departure triggers.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID" },
+        "name": { "type": "string", "description": "SafeZone display name" },
+        "address": { "type": "string", "description": "Street address or area description" },
+        "radiusMeters": { "type": "integer", "description": "Geofence radius in meters" },
+        "latitude": { "type": "number", "description": "Center latitude" },
+        "longitude": { "type": "number", "description": "Center longitude" },
+        "notifyOnArrival": { "type": "boolean", "description": "Trigger alert on arrival" },
+        "notifyOnDeparture": { "type": "boolean", "description": "Trigger alert on departure" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation (FieldValue.serverTimestamp())" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update (FieldValue.serverTimestamp())" }
+      },
+      "required": [
+        "userId",
+        "name",
+        "address",
+        "radiusMeters",
+        "latitude",
+        "longitude",
+        "notifyOnArrival",
+        "notifyOnDeparture",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "UserDevice": {
+      "title": "UserDevice",
+      "description": "Registered device/phone belonging to the authenticated account with remote telemetry and consent state.",
+      "type": "object",
+      "properties": {
+        "deviceId": { "type": "string", "description": "Unique hardware or client device identifier" },
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID" },
+        "name": { "type": "string", "description": "Friendly name of the device" },
+        "model": { "type": "string", "description": "Device hardware model (e.g. Pixel 8 Pro)" },
+        "online": { "type": "boolean", "description": "Whether device is currently connected" },
+        "batteryLevel": { "type": "integer", "description": "Battery percentage (0-100)" },
+        "latitude": { "type": "number", "description": "Current GPS latitude" },
+        "longitude": { "type": "number", "description": "Current GPS longitude" },
+        "accuracyMeters": { "type": "integer", "description": "GPS accuracy in meters" },
+        "locationSharingApproved": { "type": "boolean", "description": "Consent for remote location tracking" },
+        "cameraSessionApproved": { "type": "boolean", "description": "Consent for remote camera streaming" },
+        "microphoneApproved": { "type": "boolean", "description": "Consent for remote two-way voice session" },
+        "pairingCode": { "type": "string", "description": "Expiring pairing code" },
+        "lastSeenAt": { "type": "string", "format": "date-time", "description": "Timestamp when device was last active" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update" }
+      },
+      "required": [
+        "deviceId",
+        "userId",
+        "name",
+        "model",
+        "online",
+        "batteryLevel",
+        "latitude",
+        "longitude",
+        "accuracyMeters",
+        "locationSharingApproved",
+        "cameraSessionApproved",
+        "microphoneApproved",
+        "pairingCode",
+        "lastSeenAt",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "DeviceSession": {
+      "title": "DeviceSession",
+      "description": "Consent-based remote camera, voice, or location session between two paired phones with WebRTC signaling.",
+      "type": "object",
+      "properties": {
+        "sessionId": { "type": "string", "description": "Unique session ID" },
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID" },
+        "fromDeviceId": { "type": "string", "description": "Requesting device ID" },
+        "fromDeviceName": { "type": "string", "description": "Requesting device name" },
+        "toDeviceId": { "type": "string", "description": "Target device ID" },
+        "toDeviceName": { "type": "string", "description": "Target device name" },
+        "sessionType": { "type": "string", "enum": ["LOCATION", "CAMERA", "VOICE"], "description": "Type of remote session" },
+        "status": { "type": "string", "enum": ["REQUESTED", "APPROVED", "REJECTED", "ACTIVE", "ENDED"], "description": "Session approval & lifecycle status" },
+        "offerSdp": { "type": "string", "description": "WebRTC offer SDP description" },
+        "answerSdp": { "type": "string", "description": "WebRTC answer SDP description" },
+        "iceCandidatesJson": { "type": "string", "description": "Serialized ICE candidate exchange" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on session creation" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update" }
+      },
+      "required": [
+        "sessionId",
+        "userId",
+        "fromDeviceId",
+        "fromDeviceName",
+        "toDeviceId",
+        "toDeviceName",
+        "sessionType",
+        "status",
+        "offerSdp",
+        "answerSdp",
+        "iceCandidatesJson",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Root user profile document for authenticated family admin."
+    },
+    "/users/{userId}/members/{memberId}": {
+      "schema": "FamilyMember",
+      "description": "Connected family members and paired devices belonging to the user."
+    },
+    "/users/{userId}/messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Family chat messages and live location shares."
+    },
+    "/users/{userId}/alerts/{alertId}": {
+      "schema": "SafetyAlert",
+      "description": "Geofence, battery, bedtime, and emergency safety alerts."
+    },
+    "/users/{userId}/safezones/{zoneId}": {
+      "schema": "SafeZone",
+      "description": "Configured SafeZone geofences for the family."
+    },
+    "/users/{userId}/devices/{deviceId}": {
+      "schema": "UserDevice",
+      "description": "Registered phones associated with the user account."
+    },
+    "/users/{userId}/device_sessions/{sessionId}": {
+      "schema": "DeviceSession",
+      "description": "Consent-based remote camera, voice, and location sessions with WebRTC signaling."
+    }
+  }
+}

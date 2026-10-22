@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-bright": "#f5faff", "outline": "#6c7a74", "on-tertiary-container": "#003513", "on-primary-fixed-variant": "#00513e", "on-secondary": "#ffffff", "primary-fixed-dim": "#59dcb5", "surface-container-high": "#dfeaf2", "surface-dim": "#d1dbe4", "secondary": "#1c695f", "outline-variant": "#bccac2", "on-surface": "#131d23", "on-tertiary-fixed": "#002109", "background": "#f5faff", "secondary-fixed": "#a8f0e3", "primary-fixed": "#79f9d0", "on-error": "#ffffff", "error": "#ba1a1a", "surface": "#f5faff", "on-primary-container": "#003427", "secondary-container": "#a5ede0", "primary": "#006b53", "surface-container-highest": "#d9e4ec", "primary-container": "#00a884", "secondary-fixed-dim": "#8cd4c7", "on-background": "#131d23", "surface-variant": "#d9e4ec", "on-secondary-fixed-variant": "#005047", "error-container": "#ffdad6", "inverse-on-surface": "#e8f2fb", "on-primary-fixed": "#002117", "surface-container-low": "#eaf5fe", "surface-container-lowest": "#ffffff", "on-error-container": "#93000a", "on-secondary-fixed": "#00201c", "on-primary": "#ffffff", "surface-container": "#e5eff8", "on-tertiary-fixed-variant": "#005322", "on-tertiary": "#ffffff", "tertiary-fixed-dim": "#3de273", "inverse-surface": "#283238", "on-secondary-container": "#226e63", "on-surface-variant": "#3d4a44", "tertiary": "#006d2f", "inverse-primary": "#59dcb5", "surface-tint": "#006b53", "tertiary-fixed": "#66ff8e", "tertiary-container": "#00ab4e" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-sm": "0.5rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "gutter-lg": "1.5rem", "margin-lg": "1.5rem", "space-md": "1rem", "space-xs": "0.25rem", "margin": "1rem", "margin-sm": "0.75rem", "gutter": "1rem", "space-xl": "2rem" }, "fontFamily": { "body-sm": ["Roboto Flex"], "headline-lg": ["Roboto Flex"], "title-lg": ["Roboto Flex"], "headline-lg-mobile": ["Roboto Flex"], "body-md": ["Roboto Flex"], "label-sm": ["Roboto Flex"], "body-lg": ["Roboto Flex"], "label-md": ["Roboto Flex"], "headline-sm": ["Roboto Flex"], "label-lg": ["Roboto Flex"], "title-md": ["Roboto Flex"], "headline-md": ["Roboto Flex"] }, "fontSize": { "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "title-lg": ["16px", { "lineHeight": "22px", "fontWeight": "600" }], "headline-lg-mobile": ["26px", { "lineHeight": "32px", "fontWeight": "700" }], "body-md": ["14.5px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "400" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "500" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "title-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface-container-lowest font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-6 px-margin flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm"><span>12:30</span><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[15px]">wifi</span><span class="material-symbols-outlined text-[15px]">signal_cellular_alt</span><span class="font-label-sm text-label-sm font-medium">85%</span><span class="material-symbols-outlined text-[15px]">battery_full</span></div></div><div class="h-16 px-space-sm flex items-center justify-between"><div class="flex items-center gap-space-xs"><button aria-label="Back" class="w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><img alt="TrackView Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKK4s12E2rIvPeCpON-H1dSTZhvMVU44aqKfFe9LGAje8GCiVe6-KPWHzX162q19oZ9dBRNFTfFdUpsREZZOcfGPlA5EDFmQCEBRG8sQWXC2BwZseOiySRZhhiw6VzAP4ElrEQWtZFRvh1SSD5OGnzUFpy75YHQHZeHuVqcn52nSrUs620mNrHXZgaIxJv-9XXq0Sxx9QptSk4oZvWbtULlTac2TtXlfNCa-B8Znd8aWSjf1lcXLza"/><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight truncate">Family Member Detail</h1></div><div class="flex items-center gap-space-xs"><button aria-label="More" class="w-11 h-11 flex items-center justify-center text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-[24px]">more_vert</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-xs"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 bg-surface-container-lowest min-h-screen pb-safe"><div class="flex flex-col w-full relative">
+<!-- Interactive Sub-Header / Real-Time Live Status Bar -->
+<div class="sticky top-0 z-30 bg-surface-container-lowest/95 backdrop-blur-md px-margin py-2 shadow-sm flex items-center justify-between">
+<div class="flex items-center gap-space-sm min-w-0">
+<div class="relative flex-shrink-0">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait photo of Sarah Miller, friendly woman with auburn hair wearing a soft cream knit sweater, warm natural morning lighting with a soft green blurred background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9EgTZCknVYv4fK53Z0nwFHeoeuJZ_TNc9elswQP50mhtKEx61UI4nctAi7YPHSNsW2zjBhwndymypUHW3zPmXN5brGqn-1IYxcL8wUhFPrOMyDU5u3u1c8Y_ENO0jCmUk1kiW_2TspGJx9-ODQGpz84p6f4KxcQrZIgRqIv8Cqt44cKCjRys3ApUdHeBsmcqR6PJ3JO1ebndygS2haxWSBTqgpmZSQCyS4-mrmjnOUcAbZmJRXJ67"/>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-primary-container rounded-full ring-2 ring-surface-container-lowest flex items-center justify-center">
+<span class="w-1.5 h-1.5 bg-surface-container-lowest rounded-full animate-ping"></span>
+</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-lg text-title-lg text-on-surface truncate leading-tight">Sarah Miller</span>
+<div class="flex items-center gap-1.5 text-secondary font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-primary-container inline-block animate-pulse"></span>
+<span class="truncate font-medium">Live sharing active • 84% batt</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant">
+<button aria-label="Video Call" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px] text-primary">videocam</span>
+</button>
+<button aria-label="Voice Call" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px] text-primary">call</span>
+</button>
+<button aria-label="Quick Safety Alert" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px] text-primary">security</span>
+</button>
+</div>
+</div>
+<!-- Chat Canvas Body with WhatsApp Warm Tonal Surface -->
+<div class="relative w-full bg-[#EFEAE2] min-h-[640px] px-margin py-space-md flex flex-col gap-3">
+<!-- Subtle Ambient Wallpaper SVG Pattern Overlay -->
+<div aria-hidden="true" class="absolute inset-0 pointer-events-none opacity-[0.035] overflow-hidden">
+<svg height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="80" id="chat-doodle" patternunits="userSpaceOnUse" width="80">
+<path d="M20 15a5 5 0 0 1 5 5v10a5 5 0 0 1-10 0V20a5 5 0 0 1 5-5zm40 30a6 6 0 1 0 0 12 6 6 0 0 0 0-12zm-35 25h12v4H25zm35-40l6 8h-12z" fill="#000000"></path>
+</pattern>
+</defs>
+<rect fill="url(#chat-doodle)" height="100%" width="100%"></rect>
+</svg>
+</div>
+<!-- Date Divider Pill -->
+<div class="flex justify-center z-10 my-1">
+<span class="bg-surface-container-lowest/80 backdrop-blur-md px-3 py-1 rounded-full text-on-surface-variant font-label-sm text-label-sm shadow-[0_1px_2px_rgba(0,0,0,0.06)] font-semibold tracking-wider uppercase">
+        Today
+      </span>
+</div>
+<!-- Security Encryption Notice -->
+<div class="flex justify-center z-10 mx-2">
+<div class="bg-[#FFEAA7]/60 backdrop-blur-sm rounded-lg px-3.5 py-2 max-w-sm text-center shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+<p class="font-label-sm text-label-sm text-[#5C4D28] leading-tight flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[13px] text-[#5C4D28]">lock</span>
+<span>Messages &amp; location sharing are end-to-end encrypted. Outside parties cannot view them.</span>
+</p>
+</div>
+</div>
+<!-- Message 1: Incoming (Sarah) -->
+<div class="flex flex-col items-start z-10 max-w-[85%] self-start">
+<div class="relative bg-surface-container-lowest text-on-surface rounded-2xl rounded-tl-sm px-3.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.08)]">
+<p class="font-body-md text-body-md leading-relaxed pr-8">
+          Hey! Leaving the downtown office now, heading towards 5th Avenue.
+        </p>
+<div class="flex items-center justify-end gap-1 mt-0.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant/70">10:30 AM</span>
+</div>
+</div>
+</div>
+<!-- Message 2: Outgoing (You) -->
+<div class="flex flex-col items-end z-10 max-w-[85%] self-end">
+<div class="relative bg-[#D9FDD3] text-on-surface rounded-2xl rounded-tr-sm px-3.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.08)]">
+<p class="font-body-md text-body-md leading-relaxed pr-10">
+          Sounds good! Traffic is heavy on Main St. Can you share your live location so I know when dinner should be ready?
+        </p>
+<div class="flex items-center justify-end gap-1 mt-0.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant/70">10:32 AM</span>
+<span class="material-symbols-outlined text-[14px] text-secondary font-bold">done_all</span>
+</div>
+</div>
+</div>
+<!-- Message 3: Incoming Rich Live Location Card (Sarah) -->
+<div class="flex flex-col items-start z-10 w-full max-w-[328px] self-start">
+<div class="bg-surface-container-lowest rounded-2xl rounded-tl-sm overflow-hidden shadow-[0_2px_6px_rgba(0,0,0,0.1)] w-full">
+<!-- Live Header Banner inside Card -->
+<div class="bg-primary-container px-3.5 py-2 flex items-center justify-between text-on-primary">
+<div class="flex items-center gap-2">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-surface-container-lowest opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-surface-container-lowest"></span>
+</span>
+<span class="font-label-sm text-label-sm font-bold tracking-wide uppercase">Live Location • 1 hr active</span>
+</div>
+<span class="font-label-sm text-label-sm opacity-90">Exp 11:35 AM</span>
+</div>
+<!-- Embedded Map Snapshot -->
+<div class="relative w-full h-44 bg-surface-container" data-location="5th Avenue and Downtown, New York, NY" style="">
+<!-- Live User Pin overlay -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none">
+<div class="relative flex items-center justify-center">
+<!-- Animated Concentric Rings for Live Radar Pulse -->
+<span class="absolute w-14 h-14 rounded-full bg-primary-container/20 animate-ping"></span>
+<span class="absolute w-10 h-10 rounded-full bg-primary-container/30"></span>
+<!-- Avatar circle -->
+<div class="relative w-9 h-9 rounded-full ring-2 ring-surface-container-lowest shadow-md overflow-hidden bg-surface-container-lowest">
+<img class="w-full h-full object-cover" data-alt="Close up crop of Sarah Miller with vibrant friendly expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNyCVIZF3cVrYplingZfAmORDn63abRbYGfCBJ-TJqzIIZeTkwesiihYWheLH5BKpO-thUyPHpvKyACnbtgy2UOP17EeHhB_6w_-fH4r5wYM-R6E_Ewfz8A5LpNo1kO7_EY2QK1WE2y6lo0uHnqJo8auYVieX8mukmYR6SU5BmOtu4GCi8rN0tdUmhMWBTK_n0u-iVNXOh7i-rHHCv4AUbg5BuYYfkI-asfzWJwNIr8rBWfV0Mi92F"/>
+</div>
+</div>
+<!-- Destination Indicator Ribbon -->
+<div class="mt-1 px-2 py-0.5 rounded-full bg-surface-container-lowest/90 backdrop-blur-sm shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[11px] text-primary">navigation</span>
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Moving East</span>
+</div>
+</div>
+<!-- Bottom Metric Bar Overlay -->
+<div class="absolute bottom-2 inset-x-2 bg-surface-container-lowest/90 backdrop-blur-md rounded-lg px-2.5 py-1.5 flex items-center justify-between text-on-surface shadow-sm">
+<div class="flex items-center gap-1 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[13px] text-primary">speed</span>
+<span class="font-medium">24 mph</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px] text-primary">gps_fixed</span>
+<span>5m acc</span>
+</div>
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[13px] text-primary">battery_charging_80</span>
+<span>82%</span>
+</div>
+</div>
+</div>
+<!-- Card Footer Action -->
+<div class="p-3 bg-surface-container-lowest flex flex-col gap-2">
+<button class="w-full h-9 rounded-full bg-secondary-container text-on-secondary-container font-label-lg text-label-lg font-semibold flex items-center justify-center gap-1.5 active:scale-[0.98] transition-transform" id="viewMapBtn">
+<span class="material-symbols-outlined text-[18px]">map</span>
+<span>View Live Map &amp; Route</span>
+</button>
+<div class="flex items-center justify-between pt-0.5 text-on-surface-variant font-label-sm text-label-sm">
+<span class="truncate">Downtown → 5th Ave (ETA 14 min)</span>
+<span>10:35 AM</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Message 4: Outgoing Response (You) -->
+<div class="flex flex-col items-end z-10 max-w-[85%] self-end">
+<div class="relative bg-[#D9FDD3] text-on-surface rounded-2xl rounded-tr-sm px-3.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.08)]">
+<p class="font-body-md text-body-md leading-relaxed pr-10">
+          Got it, see you moving. Drive safe!
+        </p>
+<div class="flex items-center justify-end gap-1 mt-0.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant/70">10:36 AM</span>
+<span class="material-symbols-outlined text-[14px] text-secondary font-bold">done_all</span>
+</div>
+</div>
+</div>
+<!-- Dynamic Interactive Notification Pop (Moments of Delight: Sarah passed Geofence) -->
+<div class="self-center z-10 my-1 bg-surface-container-lowest/90 backdrop-blur-md rounded-full px-3 py-1 shadow-sm flex items-center gap-1.5 transition-all duration-300" id="geofenceChip">
+<span class="material-symbols-outlined text-[15px] text-primary-container">near_me</span>
+<span class="font-label-sm text-label-sm text-on-surface">Sarah crossed <strong>Broadway Hub</strong> (3.2 mi away)</span>
+</div>
+</div>
+<!-- Quick Contextual Actions Tray: floating live share pill -->
+<div class="px-margin pt-2 pb-1 bg-surface-container-lowest flex items-center justify-start gap-2 overflow-x-auto">
+<button class="flex-shrink-0 h-8 px-3 rounded-full bg-secondary-container/60 hover:bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold flex items-center gap-1.5 active:scale-95 transition-all" id="shareLocationTrigger">
+<span class="material-symbols-outlined text-[16px] text-primary">add_location_alt</span>
+<span>Share my live location with Sarah</span>
+</button>
+<button class="flex-shrink-0 h-8 px-3 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm font-medium flex items-center gap-1 hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[15px]">directions_car</span>
+<span>Send ETA</span>
+</button>
+</div>
+<!-- WhatsApp Bottom Input Bar -->
+<div class="bg-surface-container-lowest px-margin py-2 flex items-center gap-2">
+<!-- Message Capsule Input Field -->
+<div class="flex-1 bg-surface-container rounded-full h-11 px-3 flex items-center gap-2 shadow-inner">
+<button aria-label="Emoji selector" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[22px]">sentiment_satisfied</span>
+</button>
+<input class="flex-1 bg-transparent border-0 outline-none font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/60 min-w-0" id="chatInput" placeholder="Type a message..." type="text"/>
+<button aria-label="Attach File or Pin" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-transform active:rotate-45" id="attachBtn">
+<span class="material-symbols-outlined text-[20px]">attach_file</span>
+</button>
+<button aria-label="Camera" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined text-[20px]">photo_camera</span>
+</button>
+</div>
+<!-- Circular Send / Mic Trigger -->
+<button aria-label="Send voice memo or message" class="w-11 h-11 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow-md active:scale-90 transition-transform" id="actionFab">
+<span class="material-symbols-outlined text-[22px]" id="fabIcon">mic</span>
+</button>
+</div>
+<!-- Interactive Attachment Drawer (Slide-up modal snippet for delight) -->
+<div class="hidden absolute bottom-16 inset-x-margin bg-surface-container-lowest rounded-2xl shadow-xl p-4 z-40 animate-in fade-in slide-in-from-bottom-3 duration-200" id="attachDrawer">
+<div class="grid grid-cols-4 gap-3 text-center">
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary flex items-center justify-center shadow group-active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[22px]">share_location</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">Live Pin</span>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow group-active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[22px]">map</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">Place</span>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-12 h-12 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center shadow group-active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[22px]">image</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">Gallery</span>
+</button>
+<button class="flex flex-col items-center gap-1 group">
+<div class="w-12 h-12 rounded-full bg-surface-container-high text-on-surface flex items-center justify-center shadow group-active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[22px]">shield</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface">SafeCheck</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const input = document.getElementById('chatInput');
+    const fabIcon = document.getElementById('fabIcon');
+    const actionFab = document.getElementById('actionFab');
+    const attachBtn = document.getElementById('attachBtn');
+    const attachDrawer = document.getElementById('attachDrawer');
+    const shareTrigger = document.getElementById('shareLocationTrigger');
+    const viewMapBtn = document.getElementById('viewMapBtn');
+
+    // Morph FAB between mic and send vector based on input content
+    if (input && fabIcon) {
+      input.addEventListener('input', (e) => {
+        if (e.target.value.trim().length > 0) {
+          fabIcon.textContent = 'send';
+        } else {
+          fabIcon.textContent = 'mic';
+        }
+      });
+    }
+
+    // Toggle attachment sheet
+    if (attachBtn && attachDrawer) {
+      attachBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        attachDrawer.classList.toggle('hidden');
+      });
+      document.addEventListener('click', (e) => {
+        if (!attachDrawer.contains(e.target) && e.target !== attachBtn) {
+          attachDrawer.classList.add('hidden');
+        }
+      });
+    }
+
+    // Quick Live Share Pill Click Delight
+    if (shareTrigger) {
+      shareTrigger.addEventListener('click', () => {
+        shareTrigger.classList.add('bg-primary-container', 'text-on-primary');
+        shareTrigger.innerHTML = '<span class="material-symbols-outlined text-[16px]">check_circle</span><span>Sharing Active (60m)</span>';
+        setTimeout(() => {
+          shareTrigger.classList.remove('bg-primary-container', 'text-on-primary');
+          shareTrigger.innerHTML = '<span class="material-symbols-outlined text-[16px] text-primary">add_location_alt</span><span>Share my live location with Sarah</span>';
+        }, 4000);
+      });
+    }
+
+    // View Map Route button feedback
+    if (viewMapBtn) {
+      viewMapBtn.addEventListener('click', () => {
+        viewMapBtn.textContent = 'Opening Full Route...';
+        setTimeout(() => {
+          viewMapBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">map</span><span>View Live Map & Route</span>';
+        }, 1500);
+      });
+    }
+  })();
+</script></main><div class="fixed bottom-0 inset-x-0 pointer-events-none pb-2 flex justify-center z-50"><div class="w-32 h-1 bg-on-surface-variant/30 rounded-full"></div></div></body></html>

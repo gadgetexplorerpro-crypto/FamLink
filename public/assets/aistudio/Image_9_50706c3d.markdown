@@ -1,0 +1,220 @@
+---
+name: TrackView Privacy-First Family Sharing
+colors:
+  surface: '#f5faff'
+  surface-dim: '#d1dbe4'
+  surface-bright: '#f5faff'
+  surface-container-lowest: '#ffffff'
+  surface-container-low: '#eaf5fe'
+  surface-container: '#e5eff8'
+  surface-container-high: '#dfeaf2'
+  surface-container-highest: '#d9e4ec'
+  on-surface: '#131d23'
+  on-surface-variant: '#3d4a44'
+  inverse-surface: '#283238'
+  inverse-on-surface: '#e8f2fb'
+  outline: '#6c7a74'
+  outline-variant: '#bccac2'
+  surface-tint: '#006b53'
+  primary: '#006b53'
+  on-primary: '#ffffff'
+  primary-container: '#00a884'
+  on-primary-container: '#003427'
+  inverse-primary: '#59dcb5'
+  secondary: '#1c695f'
+  on-secondary: '#ffffff'
+  secondary-container: '#a5ede0'
+  on-secondary-container: '#226e63'
+  tertiary: '#006d2f'
+  on-tertiary: '#ffffff'
+  tertiary-container: '#00ab4e'
+  on-tertiary-container: '#003513'
+  error: '#ba1a1a'
+  on-error: '#ffffff'
+  error-container: '#ffdad6'
+  on-error-container: '#93000a'
+  primary-fixed: '#79f9d0'
+  primary-fixed-dim: '#59dcb5'
+  on-primary-fixed: '#002117'
+  on-primary-fixed-variant: '#00513e'
+  secondary-fixed: '#a8f0e3'
+  secondary-fixed-dim: '#8cd4c7'
+  on-secondary-fixed: '#00201c'
+  on-secondary-fixed-variant: '#005047'
+  tertiary-fixed: '#66ff8e'
+  tertiary-fixed-dim: '#3de273'
+  on-tertiary-fixed: '#002109'
+  on-tertiary-fixed-variant: '#005322'
+  background: '#f5faff'
+  on-background: '#131d23'
+  surface-variant: '#d9e4ec'
+typography:
+  headline-lg:
+    fontFamily: Roboto Flex
+    fontSize: 32px
+    fontWeight: '700'
+    lineHeight: 40px
+  headline-lg-mobile:
+    fontFamily: Roboto Flex
+    fontSize: 26px
+    fontWeight: '700'
+    lineHeight: 32px
+  headline-md:
+    fontFamily: Roboto Flex
+    fontSize: 22px
+    fontWeight: '600'
+    lineHeight: 28px
+  headline-sm:
+    fontFamily: Roboto Flex
+    fontSize: 18px
+    fontWeight: '600'
+    lineHeight: 24px
+  title-lg:
+    fontFamily: Roboto Flex
+    fontSize: 16px
+    fontWeight: '600'
+    lineHeight: 22px
+  title-md:
+    fontFamily: Roboto Flex
+    fontSize: 14px
+    fontWeight: '500'
+    lineHeight: 20px
+  body-lg:
+    fontFamily: Roboto Flex
+    fontSize: 16px
+    fontWeight: '400'
+    lineHeight: 24px
+  body-md:
+    fontFamily: Roboto Flex
+    fontSize: 14.5px
+    fontWeight: '400'
+    lineHeight: 20px
+  body-sm:
+    fontFamily: Roboto Flex
+    fontSize: 13px
+    fontWeight: '400'
+    lineHeight: 18px
+  label-lg:
+    fontFamily: Roboto Flex
+    fontSize: 14px
+    fontWeight: '500'
+    lineHeight: 20px
+  label-md:
+    fontFamily: Roboto Flex
+    fontSize: 12px
+    fontWeight: '500'
+    lineHeight: 16px
+  label-sm:
+    fontFamily: Roboto Flex
+    fontSize: 11px
+    fontWeight: '400'
+    lineHeight: 14px
+rounded:
+  sm: 0.25rem
+  DEFAULT: 0.5rem
+  md: 0.75rem
+  lg: 1rem
+  xl: 1.5rem
+  full: 9999px
+spacing:
+  gutter: 1rem
+  gutter-sm: 0.5rem
+  gutter-lg: 1.5rem
+  margin: 1rem
+  margin-sm: 0.75rem
+  margin-lg: 1.5rem
+  space-xs: 0.25rem
+  space-sm: 0.5rem
+  space-md: 1rem
+  space-lg: 1.5rem
+  space-xl: 2rem
+---
+
+## Brand & Style
+
+This design system establishes a high-trust, authentic communication environment tailored for real-time family location tracking, geo-fenced safety boundaries, and instant messaging. It combines the utility and instant familiarity of WhatsApp's Android experience with modern Material 3 conventions: purposeful hierarchy, dynamic surface contrast, and strict adherence to Android ergonomics.
+
+The visual style is **Clean Modern Utility**:
+- **Trust & Clarity First:** High data-density without visual friction. Essential safety metrics (battery status, live speed, GPS freshness, and connection state) are readable at a glance without decorative interference.
+- **Physical Handheld Comfort:** Engineered for one-handed operation on mid-to-large Android viewports, maintaining 48dp minimum interactive touch targets, thumb-accessible bottom navigation, and pinned floating action hubs.
+- **Privacy Assurance:** Clear demarcation between inactive location pins (static gray/teal coordinates) and real-time streaming states (pulsing vibrant live green indicators with countdown timers and instant stop switches).
+
+## Colors
+
+The color palette directly references WhatsApp's iconic emerald and deep teal signatures, calibrated specifically for Material 3 tonal contrast and communicative location states:
+
+- **Primary (`#00A884`):** Brand focal points, active floating action buttons, primary action triggers, and primary confirmation checkmarks.
+- **Secondary / App Bar Anchor (`#075E54`):** High-prominence header bars, security verification shields, and contextual action modes.
+- **Tertiary / Live Status (`#25D366`):** Dedicated to active real-time location broadcasts, presence dots, and live pulse rings. Paired with a danger color (`#EA4335`) specifically allocated for "Stop Sharing" controls and critical safety alerts.
+- **Neutral Primary (`#111B21`):** High-emphasis titles, message body text, and family member names.
+- **Neutral Secondary (`#667781`):** Timestamps, metadata (e.g., "Updated 2m ago", battery percentages, distance markers), and unselected navigation icons.
+- **Surface & Backgrounds:**
+  - Base canvas: `#F0F2F5` for settings and directory list backdrops.
+  - Chat/Map container backdrop: `#EFEAE2` carrying a subtle textured or neutral warm undertone.
+  - Surface elevated / Card: `#FFFFFF`.
+  - Outgoing message bubble: `#D9FDD3` with dark green micro-metadata.
+  - Incoming message bubble: `#FFFFFF` with muted timestamp gray.
+  - Subtle borders and dividers: `#E9EDEF`.
+
+## Typography
+
+The type system is powered by **Roboto Flex**, offering pristine legibility at compact dimensions, consistent horizontal rhythm, and native Android familiarity.
+
+- **Headlines & Top Navigation:** Set in medium and semibold weights (`headline-sm`, `title-lg`) to anchor the WhatsApp-style top app bars and bottom sheet headers.
+- **Chat & Content Typography:** Body text standardizes on `body-md` (14.5px / 20px line-height) to match authentic messaging rhythm. Line length is constrained naturally by chat bubble max-widths (78% of container).
+- **Time, Telemetry & Status Badges:** `label-sm` (11px) and `label-md` (12px) handle dynamic readouts such as "Battery 84%", "Moving • 18 km/h", "Seen 4m ago", and chat message timestamps. Numbers use proportional lining figures for swift tabular scanning in location lists.
+
+## Layout & Spacing
+
+Layout geometry follows an exact **8dp baseline grid** (with a secondary 4dp sub-grid for fine icon, badge, and bubble alignment):
+
+- **Touch & Reach Target Standards:** All clickable elements (avatars, list rows, pin markers, audio triggers, menu dots) strictly honor a minimum boundary of 48×48dp, even if the visible glyph or avatar is smaller.
+- **Canvas Margins & Column Flow:**
+  - Phone (<600dp): 16dp horizontal margins. Full-width edge-to-edge chat canvas with pinned 8dp horizontal guttering for bubbles.
+  - Tablet / Foldable (≥600dp): Two-pane master-detail split (360dp list pane on the left with fixed navigation; dynamic map/chat view on the right with 24dp margins).
+- **Vertical Density:**
+  - WhatsApp-style conversation list items are fixed at 72dp height (52dp avatar + 16dp vertical padding) for consistent thumb scrolling.
+  - Compact location quick-cards use 56dp height.
+
+## Elevation & Depth
+
+This design system favors **flat, clean tonal layering** combined with restrained Material 3 elevation. Visual separation is accomplished primarily through clean borders (`#E9EDEF`) and subtle tinted ambient light:
+
+- **Level 0 (Flat Ground):** Map layers, chat wallpapers (`#EFEAE2`), and standard screen background surfaces (`#F0F2F5`).
+- **Level 1 (Resting Cards & Bubbles):** Chat bubbles, map summary popovers, and bottom sheet containers. Defined by zero hard dropshadow, using instead a 1px solid border (`#E9EDEF` or `#0000000A`) with an ambient drop: `0px 1px 2px rgba(11, 20, 26, 0.08)`.
+- **Level 2 (Top App Bar & Floating Chips):** Filter chips over live maps, top status banners, and search fields. Box shadow: `0px 2px 4px rgba(11, 20, 26, 0.12)`.
+- **Level 3 (Floating Action Button & Live Hub):** Circular FABs and active safety modals. Box shadow: `0px 4px 10px rgba(11, 20, 26, 0.16)`.
+- **Live Location Glow:** Pinned active streaming markers do not use standard shadow; they feature an animated concentric ring using `#25D366` at 35% and 15% opacity fading outward over a 16dp radius.
+
+## Shapes
+
+The shape hierarchy balances clean chat bubbles with pill-shaped control elements:
+
+- **Message Bubbles:** Outgoing bubbles feature rounded corners (8dp) with a sharp top-right anchor (2dp). Incoming bubbles feature rounded corners (8dp) with a sharp top-left anchor (2dp).
+- **Cards, Sheets, and Map Popups:** Defined by `rounded-lg` (16dp) or `rounded-xl` (24dp) on top edges for bottom modal sheets, creating a modern, friendly surface container.
+- **Pills & Buttons:** Quick actions ("Share Live Location", "Request Check-in", "Directions") use fully rounded pill structures (`rounded-full` / 9999px).
+- **Avatars & Markers:** Circular (1:1 aspect ratio with 50% border radius) with a 2dp solid `#FFFFFF` ring to ensure separation against map terrain and message bubbles.
+
+## Components
+
+### 1. Buttons & Actions
+- **Primary FAB (Floating Action Button):** 56×56dp circle, `#00A884` background, white center icon, positioned 16dp from the bottom-right viewport edge.
+- **Pill Buttons:** Height 40dp (horizontal padding 20dp). Solid emerald background `#00A884` with white text for primary actions; `#FFFFFF` with `#E9EDEF` border for secondary.
+- **Safety / Stop Sharing Button:** Pill button with light red fill (`#FDE8E8`), deep red text (`#EA4335`), and a red stop square glyph.
+
+### 2. Location Sharing Cards (In-Chat & Modal)
+- **Static Location Message:** High-contrast map snapshot thumbnail (16:9 ratio) topped with a circular pin icon, labeled address, and a "View in Maps" secondary pill button.
+- **Live Location Message:** Real-time card embedded into chat. Top section displays active avatar with a radiating green pulse indicator, title "Live location", subtext "Updated just now • Sharing for 1 hour", and an inline red "Stop" action button.
+
+### 3. Conversation & Member List Item
+- Standard height: 72dp.
+- Left: 48dp circular avatar with an optional bottom-right 12dp presence badge (solid `#25D366` for live streaming; gray outline for inactive).
+- Center: Member/Group name (`title-lg`, `#111B21`), second line with state snippet (`body-sm`, `#667781`, e.g., "📍 Near Oak Ridge High School • 92%").
+- Right: Timestamp in `label-sm` with delivery indicators (single check, double check, or blue read checks).
+
+### 4. Input Fields & Chat Composer
+- **Message Input Pill:** Background `#FFFFFF`, rounded 24dp, vertical padding 10dp, horizontal padding 16dp, with attachment paperclip and camera iconography in `#667781`.
+- **Voice/Send Button:** 48×48dp circular container with `#00A884` background and white micro/send vector, detached from the input capsule by 8dp.
+
+### 5. Checkboxes, Radios & Switches
+- Built to Material 3 specs: `#00A884` fill when active, `#667781` border when inactive. Switch handles glide between white-on-gray and white-on-emerald states with fluid haptic feedback.

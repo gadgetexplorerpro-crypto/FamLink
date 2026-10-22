@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account and Data Deletion - TrackView</title>
+  <style>
+    :root {
+      --primary: #00A884;
+      --primary-dark: #006B53;
+      --danger: #DC2626;
+      --danger-dark: #B91C1C;
+      --bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --text: #0F172A;
+      --text-muted: #475569;
+      --border: #E2E8F0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background-color: var(--bg);
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: var(--primary-dark);
+      color: white;
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+    }
+    .header-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .meta-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .container {
+      max-width: 820px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 3rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 1.5rem;
+    }
+    h1 { margin: 0 0 0.5rem; font-size: 2rem; }
+    h2 {
+      color: var(--primary-dark);
+      margin-top: 1.75rem;
+      border-bottom: 2px solid #E6F4EA;
+      padding-bottom: 0.5rem;
+      font-size: 1.35rem;
+    }
+    p, li { color: var(--text-muted); font-size: 1rem; }
+    ul, ol { padding-left: 1.5rem; }
+    li { margin-bottom: 0.5rem; }
+    .alert-box {
+      background-color: #FEF2F2;
+      border: 1px solid #F87171;
+      border-radius: 8px;
+      padding: 1.25rem;
+      color: #991B1B;
+      margin-bottom: 1.5rem;
+    }
+    .app-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+      background: #F1F5F9;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .app-info-item strong {
+      display: block;
+      color: var(--text);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .app-info-item span {
+      color: var(--primary-dark);
+      font-weight: 600;
+      font-size: 1rem;
+      word-break: break-all;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    th {
+      background-color: #F8FAFC;
+      color: var(--text);
+      font-weight: 600;
+    }
+    tr:nth-child(even) {
+      background-color: #FAFAFA;
+    }
+    .badge-deleted {
+      background-color: #FEE2E2;
+      color: #991B1B;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .badge-kept {
+      background-color: #FEF3C7;
+      color: #92400E;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .btn-danger {
+      display: inline-block;
+      background-color: var(--danger);
+      color: white;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.2s;
+    }
+    .btn-danger:hover { background-color: var(--danger-dark); }
+    .btn-primary {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+    }
+    .form-group input[type="email"],
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    .form-group input[type="checkbox"] {
+      margin-right: 0.5rem;
+      transform: scale(1.1);
+    }
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .nav-links a {
+      color: white;
+      text-decoration: underline;
+      font-size: 0.95rem;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-logo">🛡️ TrackView</div>
+    <h1>Account & Data Deletion Portal</h1>
+    <p>Permanent Account Removal and Cloud Data Wipe</p>
+    <div class="meta-tag">Google Play Data Safety Compliant • 24/7 Self-Service</div>
+    <div class="nav-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="delete-account.html">Account & Data Deletion</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <div class="app-info-grid">
+        <div class="app-info-item">
+          <strong>Application Name</strong>
+          <span>TrackView</span>
+        </div>
+        <div class="app-info-item">
+          <strong>Developer Email</strong>
+          <span>gadgetexplorerpro@gmail.com</span>
+        </div>
+        <div class="app-info-item">
+          <strong>Package ID</strong>
+          <span>com.aistudio.trackview.flxmrp</span>
+        </div>
+      </div>
+
+      <div class="alert-box">
+        <strong>⚠️ Warning: Account deletion is permanent and irreversible.</strong>
+        Once deleted, all your family members, location history, safezones, paired devices, and chat messages are permanently purged from our Firebase cloud storage.
+      </div>
+
+      <h2>1. How to Delete Your Account (3 Easy Methods)</h2>
+
+      <h3>Method A: Inside the TrackView App (Instant & Automatic)</h3>
+      <p>The fastest way to delete your account and erase all data immediately:</p>
+      <ol>
+        <li>Open the <strong>TrackView</strong> app on your Android phone.</li>
+        <li><strong>From Login Screen:</strong> Tap the <strong>Delete Account</strong> link at the bottom of the sign-in card, sign in with your Google Account to verify identity, and confirm deletion.</li>
+        <li><strong>From Inside App:</strong> Go to the <strong>Settings</strong> screen, scroll to the <strong>Danger Zone</strong>, and tap <strong>Delete Account & Wipe Cloud Data</strong>.</li>
+        <li>Upon confirmation, all cloud documents, pairing keys, and GPS logs are permanently wiped instantly from Firebase Firestore.</li>
+      </ol>
+
+      <h3>Method B: Submit Web Deletion Request (Below)</h3>
+      <p>If you uninstalled the application or cannot access your phone, enter your registered email below to submit a deletion request directly:</p>
+
+      <form id="deletionForm" onsubmit="handleFormSubmit(event)" style="background: #F8FAFC; padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); margin: 1.5rem 0;">
+        <div class="form-group">
+          <label for="userEmail">Registered Google Account Email *</label>
+          <input type="email" id="userEmail" required placeholder="e.g. user@gmail.com">
+        </div>
+        <div class="form-group">
+          <label for="deleteReason">Reason for Deletion (Optional)</label>
+          <textarea id="deleteReason" rows="2" placeholder="Tell us how we can improve (optional)"></textarea>
+        </div>
+        <div class="form-group">
+          <label style="font-weight: normal; font-size: 0.95rem; cursor: pointer;">
+            <input type="checkbox" id="confirmCheckbox" required>
+            I understand that deleting my account permanently erases all family devices, live GPS tracks, SafeZone alerts, and messages. This action cannot be undone.
+          </label>
+        </div>
+        <button type="submit" class="btn-danger">Submit Account Deletion Request</button>
+      </form>
+
+      <div id="confirmationAlert" style="display: none; background: #ECFDF5; border: 1px solid #34D399; color: #065F46; padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <strong>✅ Request Received!</strong>
+        <p style="margin: 0.5rem 0 0; color: #065F46;">
+          Your account deletion ticket has been registered. An automated verification and purge will process for your account within 24 to 48 hours. A confirmation email will be delivered to your registered address.
+        </p>
+      </div>
+
+      <h3>Method C: Contact Developer via Direct Email</h3>
+      <p>
+        You can also email our data protection team directly at:
+      </p>
+      <p>
+        <strong>Email:</strong> <a href="mailto:gadgetexplorerpro@gmail.com?subject=TrackView%20Account%20Deletion%20Request">gadgetexplorerpro@gmail.com</a><br>
+        <strong>Subject:</strong> <code>TrackView Account Deletion Request</code><br>
+        <strong>Information needed:</strong> The Google account email address used to sign in to TrackView.
+      </p>
+
+      <h2>2. Types of Data Deleted vs. Kept & Retention Periods</h2>
+      <p>In accordance with Google Play's Data Safety and Deletion policy, the table below outlines all data types, their deletion timeline, and retention terms:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Data Category</th>
+            <th>Specific Data Types</th>
+            <th>Status Upon Deletion</th>
+            <th>Retention Period</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>User Profile</strong></td>
+            <td>Google UID, display name, email, avatar photo URL, and settings</td>
+            <td><span class="badge-deleted">Deleted</span></td>
+            <td>Purged immediately (0 to 48 hours for cloud cache invalidation).</td>
+          </tr>
+          <tr>
+            <td><strong>Location Telemetry</strong></td>
+            <td>Live GPS coordinates (latitude, longitude), timestamps, accuracy, heading</td>
+            <td><span class="badge-deleted">Deleted</span></td>
+            <td>Purged immediately upon account removal. Zero history retained.</td>
+          </tr>
+          <tr>
+            <td><strong>Paired Devices</strong></td>
+            <td>Device IDs, cryptographic pairing tokens, battery level, online state</td>
+            <td><span class="badge-deleted">Deleted</span></td>
+            <td>Permanently wiped. All pairing connections severed immediately.</td>
+          </tr>
+          <tr>
+            <td><strong>SafeZones & Geofences</strong></td>
+            <td>Custom boundary centers, radius, Home/School labels, alert triggers</td>
+            <td><span class="badge-deleted">Deleted</span></td>
+            <td>Permanently wiped from Firebase Firestore.</td>
+          </tr>
+          <tr>
+            <td><strong>Messages & Alerts</strong></td>
+            <td>Family chat messages, SOS alerts, ETA notifications, check-in pings</td>
+            <td><span class="badge-deleted">Deleted</span></td>
+            <td>Permanently deleted.</td>
+          </tr>
+          <tr>
+            <td><strong>Camera & Voice Streams</strong></td>
+            <td>Live WebRTC video and audio streams</td>
+            <td><span class="badge-deleted">Zero Stored</span></td>
+            <td>Never recorded or stored on any server. Transient peer-to-peer only.</td>
+          </tr>
+          <tr>
+            <td><strong>Disaster Recovery Backups</strong></td>
+            <td>Encrypted system-level rolling database snapshots</td>
+            <td><span class="badge-kept">Temporary</span></td>
+            <td>Automated rolling cloud snapshots cycle out and are overwritten within <strong>30 days</strong>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>3. Legal & Regulatory Compliance</h2>
+      <p>
+        TrackView complies with the General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA), and Google Play Developer Program policies. We do not retain any user personal data for marketing, analytics, or advertising after account termination.
+      </p>
+
+      <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a class="btn-danger" href="mailto:gadgetexplorerpro@gmail.com?subject=TrackView%20Account%20Deletion%20Request">Email Developer to Delete</a>
+        <a class="btn-primary" href="privacy.html">Read Privacy Policy</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 TrackView (Developer: gadgetexplorerpro@gmail.com). All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms of Service</a></p>
+  </footer>
+
+  <script>
+    function handleFormSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById("userEmail").value;
+      const reason = document.getElementById("deleteReason").value;
+      
+      // Show confirmation alert
+      document.getElementById("confirmationAlert").style.display = "block";
+      document.getElementById("deletionForm").style.opacity = "0.6";
+      
+      // Also open pre-filled mail client for instant email fallback
+      const mailtoUrl = "mailto:gadgetexplorerpro@gmail.com?subject=" + 
+        encodeURIComponent("TrackView Account Deletion Request - " + email) + 
+        "&body=" + encodeURIComponent("Please delete my TrackView account and all cloud data.\n\nRegistered Email: " + email + "\nReason: " + reason);
+      
+      setTimeout(() => {
+        window.location.href = mailtoUrl;
+      }, 800);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,246 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidTimestamp(ts) {
+      return ts is timestamp && ts <= request.time;
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll([
+               'userId', 'displayName', 'email', 'avatarUrl', 'statusMessage',
+               'ghostModeEnabled', 'shareBatteryStatus', 'darkModeMapStyling',
+               'speedUnit', 'planTier', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'displayName', 'email', 'avatarUrl', 'statusMessage',
+               'ghostModeEnabled', 'shareBatteryStatus', 'darkModeMapStyling',
+               'speedUnit', 'planTier', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId == request.auth.uid &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 80 &&
+             data.email is string && data.email.size() >= 1 && data.email.size() <= 150 &&
+             data.avatarUrl is string && data.avatarUrl.size() <= 600 &&
+             data.statusMessage is string && data.statusMessage.size() <= 150 &&
+             data.ghostModeEnabled is bool &&
+             data.shareBatteryStatus is bool &&
+             data.darkModeMapStyling is bool &&
+             data.speedUnit is string && data.speedUnit in ['MPH', 'KMH'] &&
+             data.planTier is string && data.planTier in ['FREE', 'PREMIUM_MONTHLY', 'PREMIUM_ANNUAL'] &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidFamilyMember(data) {
+      return data.keys().hasAll([
+               'userId', 'name', 'role', 'avatarUrl', 'online', 'liveSharing',
+               'pinned', 'favorite', 'batteryLevel', 'speedMph', 'locationLabel',
+               'lastMessageSnippet', 'lastActivityTimeLabel', 'unreadCount',
+               'screenTimeMinutesToday', 'screenTimeLimitMinutes', 'latitude', 'longitude',
+               'accuracyMeters', 'notifyOnSchoolDeparture', 'ghostMode',
+               'appRestrictionsEnabled', 'websiteSafetyEnabled', 'bedtimeSchedule',
+               'pairingCode', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'name', 'role', 'avatarUrl', 'online', 'liveSharing',
+               'pinned', 'favorite', 'batteryLevel', 'speedMph', 'locationLabel',
+               'lastMessageSnippet', 'lastActivityTimeLabel', 'unreadCount',
+               'screenTimeMinutesToday', 'screenTimeLimitMinutes', 'latitude', 'longitude',
+               'accuracyMeters', 'notifyOnSchoolDeparture', 'ghostMode',
+               'appRestrictionsEnabled', 'websiteSafetyEnabled', 'bedtimeSchedule',
+               'pairingCode', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId == request.auth.uid &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 80 &&
+             data.role is string && data.role in ['SPOUSE', 'CHILD', 'SIBLING', 'GROUP', 'BOT'] &&
+             data.avatarUrl is string && data.avatarUrl.size() <= 600 &&
+             data.online is bool &&
+             data.liveSharing is bool &&
+             data.pinned is bool &&
+             data.favorite is bool &&
+             data.batteryLevel is int && data.batteryLevel >= 0 && data.batteryLevel <= 100 &&
+             data.speedMph is int && data.speedMph >= 0 && data.speedMph <= 200 &&
+             data.locationLabel is string && data.locationLabel.size() >= 1 && data.locationLabel.size() <= 120 &&
+             data.lastMessageSnippet is string && data.lastMessageSnippet.size() >= 1 && data.lastMessageSnippet.size() <= 250 &&
+             data.lastActivityTimeLabel is string && data.lastActivityTimeLabel.size() >= 1 && data.lastActivityTimeLabel.size() <= 40 &&
+             data.unreadCount is int && data.unreadCount >= 0 && data.unreadCount <= 999 &&
+             data.screenTimeMinutesToday is int && data.screenTimeMinutesToday >= 0 && data.screenTimeMinutesToday <= 1440 &&
+             data.screenTimeLimitMinutes is int && data.screenTimeLimitMinutes >= 0 && data.screenTimeLimitMinutes <= 1440 &&
+             (data.latitude is float || data.latitude is int) && data.latitude >= -90 && data.latitude <= 90 &&
+             (data.longitude is float || data.longitude is int) && data.longitude >= -180 && data.longitude <= 180 &&
+             data.accuracyMeters is int && data.accuracyMeters >= 1 && data.accuracyMeters <= 5000 &&
+             data.notifyOnSchoolDeparture is bool &&
+             data.ghostMode is bool &&
+             data.appRestrictionsEnabled is bool &&
+             data.websiteSafetyEnabled is bool &&
+             data.bedtimeSchedule is string && data.bedtimeSchedule.size() >= 1 && data.bedtimeSchedule.size() <= 60 &&
+             data.pairingCode is string && data.pairingCode.size() >= 1 && data.pairingCode.size() <= 20 &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidChatMessage(data) {
+      return data.keys().hasAll([
+               'userId', 'memberId', 'senderName', 'outgoing', 'text',
+               'messageType', 'timeLabel', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'memberId', 'senderName', 'outgoing', 'text',
+               'messageType', 'timeLabel', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId == request.auth.uid &&
+             isValidId(data.memberId) &&
+             data.senderName is string && data.senderName.size() >= 1 && data.senderName.size() <= 80 &&
+             data.outgoing is bool &&
+             data.text is string && data.text.size() >= 1 && data.text.size() <= 1000 &&
+             data.messageType is string && data.messageType in ['TEXT', 'LIVE_LOCATION', 'STATIC_PIN', 'VOICE_NOTE', 'GEOFENCE_EVENT'] &&
+             data.timeLabel is string && data.timeLabel.size() >= 1 && data.timeLabel.size() <= 40 &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidSafetyAlert(data) {
+      return data.keys().hasAll([
+               'userId', 'memberName', 'alertType', 'title', 'description',
+               'timeLabel', 'read', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'memberName', 'alertType', 'title', 'description',
+               'timeLabel', 'read', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId == request.auth.uid &&
+             data.memberName is string && data.memberName.size() >= 1 && data.memberName.size() <= 80 &&
+             data.alertType is string && data.alertType in ['ARRIVAL', 'DEPARTURE', 'OFFLINE', 'LOW_BATTERY', 'SCREEN_TIME', 'BEDTIME', 'EMERGENCY'] &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 120 &&
+             data.description is string && data.description.size() >= 1 && data.description.size() <= 300 &&
+             data.timeLabel is string && data.timeLabel.size() >= 1 && data.timeLabel.size() <= 40 &&
+             data.read is bool &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    function isValidSafeZone(data) {
+      return data.keys().hasAll([
+               'userId', 'name', 'address', 'radiusMeters', 'latitude',
+               'longitude', 'notifyOnArrival', 'notifyOnDeparture', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'name', 'address', 'radiusMeters', 'latitude',
+               'longitude', 'notifyOnArrival', 'notifyOnDeparture', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId == request.auth.uid &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 80 &&
+             data.address is string && data.address.size() >= 1 && data.address.size() <= 160 &&
+             data.radiusMeters is int && data.radiusMeters >= 50 && data.radiusMeters <= 5000 &&
+             (data.latitude is float || data.latitude is int) && data.latitude >= -90 && data.latitude <= 90 &&
+             (data.longitude is float || data.longitude is int) && data.longitude >= -180 && data.longitude <= 180 &&
+             data.notifyOnArrival is bool &&
+             data.notifyOnDeparture is bool &&
+             isValidTimestamp(data.createdAt) &&
+             isValidTimestamp(data.updatedAt);
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if isOwner(userId) && existing().userId == request.auth.uid;
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'displayName', 'email', 'avatarUrl', 'statusMessage',
+                         'ghostModeEnabled', 'shareBatteryStatus', 'darkModeMapStyling',
+                         'speedUnit', 'planTier', 'updatedAt'
+                       ]);
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      match /members/{memberId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(memberId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(memberId) && isValidFamilyMember(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(memberId) &&
+                         isValidFamilyMember(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'name', 'role', 'avatarUrl', 'online', 'liveSharing',
+                           'pinned', 'favorite', 'batteryLevel', 'speedMph', 'locationLabel',
+                           'lastMessageSnippet', 'lastActivityTimeLabel', 'unreadCount',
+                           'screenTimeMinutesToday', 'screenTimeLimitMinutes', 'latitude', 'longitude',
+                           'accuracyMeters', 'notifyOnSchoolDeparture', 'ghostMode',
+                           'appRestrictionsEnabled', 'websiteSafetyEnabled', 'bedtimeSchedule',
+                           'pairingCode', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(memberId);
+      }
+
+      match /messages/{messageId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(messageId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(messageId) && isValidChatMessage(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(messageId) &&
+                         isValidChatMessage(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'text', 'timeLabel', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(messageId);
+      }
+
+      match /alerts/{alertId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(alertId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(alertId) && isValidSafetyAlert(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(alertId) &&
+                         isValidSafetyAlert(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'read', 'title', 'description', 'timeLabel', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(alertId);
+      }
+
+      match /safezones/{zoneId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(zoneId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(zoneId) && isValidSafeZone(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(zoneId) &&
+                         isValidSafeZone(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'name', 'address', 'radiusMeters', 'latitude', 'longitude',
+                           'notifyOnArrival', 'notifyOnDeparture', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(zoneId);
+      }
+    }
+  }
+}
