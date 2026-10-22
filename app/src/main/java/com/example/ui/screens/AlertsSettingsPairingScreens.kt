@@ -1,6 +1,8 @@
 package com.example.ui.screens
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +22,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.platform.LocalContext
+import com.example.ui.auth.LegalAndPrivacyDialog
+import com.example.ui.auth.LegalTab
+import com.example.ui.auth.TRACKVIEW_DELETE_ACCOUNT_URL
+import com.example.ui.auth.TRACKVIEW_PRIVACY_URL
+import com.example.ui.auth.TRACKVIEW_TERMS_URL
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -372,7 +380,9 @@ fun SettingsScreen(
 ) {
   val profile = (profileState as? UiState.Success)?.data ?: UserProfile()
   val safeZones = (safeZonesState as? UiState.Success)?.data.orEmpty()
+  val context = LocalContext.current
 
+  var activeLegalDialogTab by remember { mutableStateOf<LegalTab?>(null) }
   var showQrDialog by rememberSaveable { mutableStateOf(false) }
   var showDeleteConfirmDialog by rememberSaveable { mutableStateOf(false) }
   var tripRemainingMinutes by rememberSaveable { mutableIntStateOf(42) }
@@ -432,7 +442,7 @@ fun SettingsScreen(
       contentPadding = PaddingValues(16.dp),
       verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-      // 1. WhatsApp-style Profile Card
+      // 1. WhatsApp-style Profile Card with Quick Account & Privacy Actions
       item {
         ElevatedCard(
           shape = RoundedCornerShape(18.dp),
@@ -441,63 +451,133 @@ fun SettingsScreen(
               containerColor = MaterialTheme.colorScheme.surface
             ),
         ) {
-          Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
-          ) {
-            AsyncImage(
-              model = profile.avatarUrl.ifBlank { Avatars.DAVID },
-              contentDescription = "Profile Avatar",
-              modifier =
-                Modifier.size(64.dp)
-                  .clip(CircleShape)
-                  .border(2.5.dp, TrackViewGreen, CircleShape),
-              contentScale = ContentScale.Crop,
-            )
-            Column(modifier = Modifier.weight(1f)) {
-              Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-              ) {
-                Text(
-                  text = profile.displayName,
-                  style = MaterialTheme.typography.titleMedium,
-                  fontWeight = FontWeight.Bold,
-                )
-                Surface(
-                  color = TrackViewGreen.copy(alpha = 0.16f),
-                  shape = RoundedCornerShape(6.dp),
+          Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+              AsyncImage(
+                model = profile.avatarUrl.ifBlank { Avatars.DAVID },
+                contentDescription = "Profile Avatar",
+                modifier =
+                  Modifier.size(64.dp)
+                    .clip(CircleShape)
+                    .border(2.5.dp, TrackViewGreen, CircleShape),
+                contentScale = ContentScale.Crop,
+              )
+              Column(modifier = Modifier.weight(1f)) {
+                Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                   Text(
-                    text = profile.planTier,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TrackViewTeal,
+                    text = profile.displayName,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                   )
+                  Surface(
+                    color = TrackViewGreen.copy(alpha = 0.16f),
+                    shape = RoundedCornerShape(6.dp),
+                  ) {
+                    Text(
+                      text = profile.planTier,
+                      style = MaterialTheme.typography.labelSmall,
+                      color = TrackViewTeal,
+                      fontWeight = FontWeight.Bold,
+                      modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                    )
+                  }
                 }
+                Text(
+                  text = profile.email,
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                  text = profile.statusMessage,
+                  style = MaterialTheme.typography.labelSmall,
+                  color =
+                    if (profile.ghostModeEnabled) MaterialTheme.colorScheme.error
+                    else TrackViewTeal,
+                  fontWeight = FontWeight.SemiBold,
+                )
               }
-              Text(
-                text = profile.email,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-              )
-              Text(
-                text = profile.statusMessage,
-                style = MaterialTheme.typography.labelSmall,
-                color =
-                  if (profile.ghostModeEnabled) MaterialTheme.colorScheme.error
-                  else TrackViewTeal,
-                fontWeight = FontWeight.SemiBold,
-              )
+              IconButton(onClick = { showQrDialog = true }) {
+                Icon(
+                  imageVector = Icons.Default.QrCode2,
+                  contentDescription = "Family QR",
+                  tint = TrackViewTeal,
+                )
+              }
             }
-            IconButton(onClick = { showQrDialog = true }) {
-              Icon(
-                imageVector = Icons.Default.QrCode2,
-                contentDescription = "Family QR",
-                tint = TrackViewTeal,
-              )
+
+            Spacer(modifier = Modifier.height(14.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Profile Quick Action Buttons: Delete Account & Privacy Policy
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+              OutlinedButton(
+                onClick = { activeLegalDialogTab = LegalTab.DELETE_ACCOUNT },
+                modifier = Modifier.weight(1f).testTag("profile_delete_account_button"),
+                colors =
+                  ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error,
+                  ),
+                border =
+                  androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
+                  ),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+              ) {
+                Icon(
+                  imageVector = Icons.Default.DeleteForever,
+                  contentDescription = null,
+                  modifier = Modifier.size(16.dp),
+                  tint = MaterialTheme.colorScheme.error,
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                  text = "Delete Account",
+                  style = MaterialTheme.typography.labelMedium,
+                  fontWeight = FontWeight.Bold,
+                )
+              }
+
+              OutlinedButton(
+                onClick = { activeLegalDialogTab = LegalTab.PRIVACY },
+                modifier = Modifier.weight(1f).testTag("profile_privacy_policy_button"),
+                colors =
+                  ButtonDefaults.outlinedButtonColors(
+                    contentColor = TrackViewTeal,
+                  ),
+                border =
+                  androidx.compose.foundation.BorderStroke(
+                    1.dp,
+                    TrackViewGreen.copy(alpha = 0.5f),
+                  ),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+              ) {
+                Icon(
+                  imageVector = Icons.Default.Shield,
+                  contentDescription = null,
+                  modifier = Modifier.size(16.dp),
+                  tint = TrackViewTeal,
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                  text = "Privacy Policy",
+                  style = MaterialTheme.typography.labelMedium,
+                  fontWeight = FontWeight.Bold,
+                )
+              }
             }
           }
         }
@@ -754,13 +834,23 @@ fun SettingsScreen(
         }
       }
 
-      // 6. Privacy, Data Export & Account Management
+      // 6. Privacy, Legal & Account Management
       item {
         Card(
           shape = RoundedCornerShape(18.dp),
           colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         ) {
           Column(modifier = Modifier.fillMaxWidth()) {
+            SettingsRowItem(
+              icon = Icons.Default.Shield,
+              title = "Privacy Policy & Data Safety",
+              subtitle = "Zero covert surveillance guarantee, encryption & policies",
+              trailing = "View",
+              onClick = { activeLegalDialogTab = LegalTab.PRIVACY },
+              testTag = "settings_privacy_policy_row",
+            )
+            HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
+
             SettingsRowItem(
               icon = Icons.Default.CloudDownload,
               title = "Export Location & SafeZone Archive",
@@ -773,10 +863,10 @@ fun SettingsScreen(
 
             SettingsRowItem(
               icon = Icons.Default.DeleteForever,
-              title = "Delete Account & Wipe History",
-              subtitle = "Permanently erase all cloud locations, messages & SafeZones",
-              trailing = "Wipe",
-              onClick = { showDeleteConfirmDialog = true },
+              title = "Delete Account & Cloud Wipe",
+              subtitle = "Permanently purge account, paired devices, GPS logs & SafeZones",
+              trailing = "Delete",
+              onClick = { activeLegalDialogTab = LegalTab.DELETE_ACCOUNT },
               testTag = "settings_delete_account_row",
             )
             HorizontalDivider(modifier = Modifier.padding(start = 56.dp))
@@ -793,21 +883,74 @@ fun SettingsScreen(
         }
       }
 
-      // Footer Compliance Metadata
+      // Footer Compliance Metadata & Direct Legal Links
       item {
         Column(
-          modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+          modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
           horizontalAlignment = Alignment.CenterHorizontally,
+          verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
+          Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            Text(
+              text = "Privacy Policy",
+              style = MaterialTheme.typography.labelMedium,
+              color = MaterialTheme.colorScheme.primary,
+              fontWeight = FontWeight.SemiBold,
+              modifier =
+                Modifier.clickable { activeLegalDialogTab = LegalTab.PRIVACY }
+                  .testTag("footer_privacy_policy_link"),
+            )
+            Text(
+              text = "•",
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            Text(
+              text = "Terms of Service",
+              style = MaterialTheme.typography.labelMedium,
+              color = MaterialTheme.colorScheme.primary,
+              fontWeight = FontWeight.SemiBold,
+              modifier =
+                Modifier.clickable { activeLegalDialogTab = LegalTab.TERMS }
+                  .testTag("footer_terms_link"),
+            )
+            Text(
+              text = "•",
+              style = MaterialTheme.typography.labelSmall,
+              color = MaterialTheme.colorScheme.outlineVariant,
+            )
+            Text(
+              text = "Delete Account",
+              style = MaterialTheme.typography.labelMedium,
+              color = MaterialTheme.colorScheme.error,
+              fontWeight = FontWeight.SemiBold,
+              modifier =
+                Modifier.clickable { activeLegalDialogTab = LegalTab.DELETE_ACCOUNT }
+                  .testTag("footer_delete_account_link"),
+            )
+          }
+
+          Spacer(modifier = Modifier.height(4.dp))
+
           Text(
             text = "TrackView v4.2.0 • End-to-End Encrypted Family Safety Mesh",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
           Text(
-            text = "Zero background tracking without explicit mutual family consent.",
+            text = "Account Deletion Portal: $TRACKVIEW_DELETE_ACCOUNT_URL",
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.outline,
+            modifier =
+              Modifier.clickable {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(TRACKVIEW_DELETE_ACCOUNT_URL))
+                context.startActivity(intent)
+              }.padding(horizontal = 8.dp, vertical = 2.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
           )
         }
       }
@@ -895,14 +1038,27 @@ fun SettingsScreen(
     )
   }
 
+  // Legal, Privacy Policy, and Account Deletion Dialog
+  activeLegalDialogTab?.let { tab ->
+    LegalAndPrivacyDialog(
+      initialTab = tab,
+      onDismiss = { activeLegalDialogTab = null },
+      actionButtonLabel = "Delete Account & Wipe Cloud Data Now",
+      onInitiateAccountDeletion = {
+        activeLegalDialogTab = null
+        showDeleteConfirmDialog = true
+      },
+    )
+  }
+
   // Delete Account Confirmation Dialog
   if (showDeleteConfirmDialog) {
     AlertDialog(
       onDismissRequest = { showDeleteConfirmDialog = false },
-      title = { Text("Delete Account & Wipe All History?") },
+      title = { Text("Permanently Delete Account?") },
       text = {
         Text(
-          "This will permanently delete your profile, paired family devices, SafeZones, and encrypted messages from Firestore."
+          "Are you sure you want to permanently delete your TrackView account?\n\nAll your family devices, pairing keys, live GPS records, SafeZones, and encrypted messages will be immediately purged from Firebase Firestore.\n\nThis action is permanent and cannot be undone."
         )
       },
       confirmButton = {
@@ -913,8 +1069,9 @@ fun SettingsScreen(
           },
           colors =
             ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+          modifier = Modifier.testTag("confirm_delete_account_final_button"),
         ) {
-          Text("Delete Permanently")
+          Text("Delete Account Now")
         }
       },
       dismissButton = {

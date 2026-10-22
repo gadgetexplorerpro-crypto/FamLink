@@ -211,11 +211,13 @@ fun signOutTrackView(
 }
 
 const val TRACKVIEW_PRIVACY_URL =
-  "https://ais-pre-gxmo6rckjutoh5xrf6xmo3-861509315491.asia-east1.run.app/privacy.html"
+  "https://ais-dev-gxmo6rckjutoh5xrf6xmo3-861509315491.asia-east1.run.app/privacy.html"
 const val TRACKVIEW_TERMS_URL =
-  "https://ais-pre-gxmo6rckjutoh5xrf6xmo3-861509315491.asia-east1.run.app/terms.html"
+  "https://ais-dev-gxmo6rckjutoh5xrf6xmo3-861509315491.asia-east1.run.app/terms.html"
 const val TRACKVIEW_DELETE_ACCOUNT_URL =
-  "https://ais-pre-gxmo6rckjutoh5xrf6xmo3-861509315491.asia-east1.run.app/delete-account.html"
+  "https://ais-dev-gxmo6rckjutoh5xrf6xmo3-861509315491.asia-east1.run.app/delete-account.html"
+const val TRACKVIEW_DATA_DELETION_URL =
+  "https://ais-dev-gxmo6rckjutoh5xrf6xmo3-861509315491.asia-east1.run.app/data-deletion.html"
 const val TRACKVIEW_SUPPORT_EMAIL = "gadgetexplorerpro@gmail.com"
 
 enum class LegalTab(val title: String) {
@@ -671,6 +673,7 @@ fun AuthAndOnboardingScreen(onAuthSuccess: () -> Unit) {
     LegalAndPrivacyDialog(
       initialTab = tab,
       onDismiss = { legalDialogTab = null },
+      actionButtonLabel = "Sign In to Delete Account Now",
       onInitiateAccountDeletion = {
         legalDialogTab = null
         isDeletingAccount = true
@@ -717,10 +720,11 @@ fun AuthAndOnboardingScreen(onAuthSuccess: () -> Unit) {
 }
 
 @Composable
-private fun LegalAndPrivacyDialog(
+fun LegalAndPrivacyDialog(
   initialTab: LegalTab,
   onDismiss: () -> Unit,
   onInitiateAccountDeletion: () -> Unit,
+  actionButtonLabel: String = "Delete Account & Wipe Cloud Data Now",
 ) {
   val context = LocalContext.current
   val clipboardManager = LocalClipboardManager.current
@@ -845,6 +849,7 @@ private fun LegalAndPrivacyDialog(
             LegalTab.DELETE_ACCOUNT ->
               DeleteAccountSection(
                 onInitiateAccountDeletion = onInitiateAccountDeletion,
+                actionButtonLabel = actionButtonLabel,
                 onOpenBrowser = {
                   val intent =
                     Intent(Intent.ACTION_VIEW, Uri.parse(TRACKVIEW_DELETE_ACCOUNT_URL))
@@ -1035,6 +1040,7 @@ private fun DeleteAccountSection(
   onOpenBrowser: () -> Unit,
   onCopyUrl: () -> Unit,
   onEmailSupport: () -> Unit,
+  actionButtonLabel: String = "Delete Account & Wipe Cloud Data Now",
 ) {
   Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
     Surface(
@@ -1069,7 +1075,7 @@ private fun DeleteAccountSection(
 
     LegalCard(
       title = "Option 1: In-App Immediate Deletion",
-      body = "Verify your Google Account by tapping the button below. All your records will be immediately purged from our servers, and your session will be signed out.",
+      body = "Tap the button below to execute instant cloud data deletion. All your records will be immediately purged from our servers, and your session will be signed out.",
     )
 
     Button(
@@ -1079,7 +1085,7 @@ private fun DeleteAccountSection(
     ) {
       Icon(Icons.Default.DeleteForever, contentDescription = null, modifier = Modifier.size(18.dp))
       Spacer(modifier = Modifier.width(8.dp))
-      Text("Sign In to Delete Account Now")
+      Text(actionButtonLabel)
     }
 
     LegalCard(

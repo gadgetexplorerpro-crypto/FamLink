@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Account and Data Deletion - TrackView</title>
+  <title>Account and Data Deletion - FamLink (TrackView)</title>
   <style>
     :root {
       --primary: #00A884;
@@ -187,6 +187,7 @@
     .nav-links {
       display: flex;
       justify-content: center;
+      flex-wrap: wrap;
       gap: 1.5rem;
       margin-top: 1rem;
     }
@@ -206,14 +207,16 @@
 </head>
 <body>
   <header>
-    <div class="header-logo">🛡️ TrackView</div>
+    <div class="header-logo">🛡️ FamLink</div>
+    <div style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.25rem;">Family Safety & GPS Locator (TrackView)</div>
     <h1>Account & Data Deletion Portal</h1>
     <p>Permanent Account Removal and Cloud Data Wipe</p>
     <div class="meta-tag">Google Play Data Safety Compliant • 24/7 Self-Service</div>
     <div class="nav-links">
       <a href="privacy.html">Privacy Policy</a>
       <a href="terms.html">Terms of Service</a>
-      <a href="delete-account.html">Account & Data Deletion</a>
+      <a href="delete-account.html">Account Deletion</a>
+      <a href="data-deletion.html">Data Deletion Request</a>
     </div>
   </header>
 
@@ -221,8 +224,8 @@
     <div class="card">
       <div class="app-info-grid">
         <div class="app-info-item">
-          <strong>Application Name</strong>
-          <span>TrackView</span>
+          <strong>Store Listing App Name</strong>
+          <span>FamLink</span>
         </div>
         <div class="app-info-item">
           <strong>Developer Email</strong>
@@ -231,6 +234,10 @@
         <div class="app-info-item">
           <strong>Package ID</strong>
           <span>com.aistudio.trackview.flxmrp</span>
+        </div>
+        <div class="app-info-item">
+          <strong>Internal App Name</strong>
+          <span>TrackView</span>
         </div>
       </div>
 
@@ -241,14 +248,18 @@
 
       <h2>1. How to Delete Your Account (3 Easy Methods)</h2>
 
-      <h3>Method A: Inside the TrackView App (Instant & Automatic)</h3>
+      <h3>Method A: Inside the FamLink / TrackView App (Instant & Automatic)</h3>
       <p>The fastest way to delete your account and erase all data immediately:</p>
       <ol>
-        <li>Open the <strong>TrackView</strong> app on your Android phone.</li>
+        <li>Open the <strong>FamLink</strong> (TrackView) app on your Android phone.</li>
         <li><strong>From Login Screen:</strong> Tap the <strong>Delete Account</strong> link at the bottom of the sign-in card, sign in with your Google Account to verify identity, and confirm deletion.</li>
         <li><strong>From Inside App:</strong> Go to the <strong>Settings</strong> screen, scroll to the <strong>Danger Zone</strong>, and tap <strong>Delete Account & Wipe Cloud Data</strong>.</li>
         <li>Upon confirmation, all cloud documents, pairing keys, and GPS logs are permanently wiped instantly from Firebase Firestore.</li>
       </ol>
+
+      <p style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.95rem;">
+        💡 <em>Want to delete specific data (like GPS tracks or SafeZones) without deleting your account? Use our <a href="data-deletion.html" style="font-weight: 600; color: #1D4ED8;">Specific Data Deletion Page</a>.</em>
+      </p>
 
       <h3>Method B: Submit Web Deletion Request (Below)</h3>
       <p>If you uninstalled the application or cannot access your phone, enter your registered email below to submit a deletion request directly:</p>
@@ -348,18 +359,19 @@
 
       <h2>3. Legal & Regulatory Compliance</h2>
       <p>
-        TrackView complies with the General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA), and Google Play Developer Program policies. We do not retain any user personal data for marketing, analytics, or advertising after account termination.
+        FamLink (TrackView) complies with the General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA), and Google Play Developer Program policies. We do not retain any user personal data for marketing, analytics, or advertising after account termination.
       </p>
 
       <div style="margin-top: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-        <a class="btn-danger" href="mailto:gadgetexplorerpro@gmail.com?subject=TrackView%20Account%20Deletion%20Request">Email Developer to Delete</a>
-        <a class="btn-primary" href="privacy.html">Read Privacy Policy</a>
+        <a class="btn-danger" href="mailto:gadgetexplorerpro@gmail.com?subject=FamLink%20TrackView%20Account%20Deletion%20Request">Email Developer to Delete</a>
+        <a class="btn-primary" href="data-deletion.html">Specific Data Deletion Request</a>
+        <a class="btn-primary" style="background-color: #475569;" href="privacy.html">Privacy Policy</a>
       </div>
     </div>
   </main>
 
   <footer>
-    <p>© 2026 TrackView (Developer: gadgetexplorerpro@gmail.com). All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms of Service</a></p>
+    <p>© 2026 FamLink / TrackView (Developer: gadgetexplorerpro@gmail.com). All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms of Service</a> | <a href="delete-account.html">Account Deletion</a> | <a href="data-deletion.html">Data Deletion</a></p>
   </footer>
 
   <script>
