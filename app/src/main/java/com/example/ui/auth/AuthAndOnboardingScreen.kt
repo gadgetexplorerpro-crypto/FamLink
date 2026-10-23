@@ -300,28 +300,29 @@ fun AuthAndOnboardingScreen(onAuthSuccess: () -> Unit) {
         Spacer(modifier = Modifier.height(12.dp))
         Box(
           modifier =
-            Modifier.size(76.dp)
+            Modifier.size(84.dp)
               .clip(RoundedCornerShape(22.dp))
               .background(
-                Brush.linearGradient(
+                Brush.verticalGradient(
                   listOf(
-                    MaterialTheme.colorScheme.primary,
-                    MaterialTheme.colorScheme.primaryContainer,
+                    Color(0xFF8AC0EE),
+                    Color(0xFF5B9AE0),
+                    Color(0xFF3573C6),
                   )
                 )
               ),
           contentAlignment = Alignment.Center,
         ) {
           Icon(
-            imageVector = Icons.Default.Security,
-            contentDescription = "TrackView Shield Logo",
-            tint = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.size(42.dp),
+            painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_launcher_foreground),
+            contentDescription = "FamLink Logo",
+            tint = Color.Unspecified,
+            modifier = Modifier.size(76.dp),
           )
         }
         Spacer(modifier = Modifier.height(14.dp))
         Text(
-          text = "TrackView",
+          text = "FamLink",
           style = MaterialTheme.typography.headlineLarge,
           color = MaterialTheme.colorScheme.primary,
           fontWeight = FontWeight.Bold,

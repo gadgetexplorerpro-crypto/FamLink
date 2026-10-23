@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "TrackView"
+rootProject.name = "FamLink"
 
 include(":app")

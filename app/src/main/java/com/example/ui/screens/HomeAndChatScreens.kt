@@ -3,6 +3,9 @@ package com.example.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,7 +49,9 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.PushPin
 import androidx.compose.material.icons.filled.QrCodeScanner
@@ -142,9 +147,19 @@ fun HomeScreen(
   onOpenPremiumModal: () -> Unit,
   onTriggerCheckIn: () -> Unit,
   onOpenDevicesTab: (() -> Unit)? = null,
+  onUploadProfilePhoto: ((Uri) -> Unit)? = null,
 ) {
   var showSearchBar by rememberSaveable { mutableStateOf(false) }
   var showOverflowMenu by remember { mutableStateOf(false) }
+
+  val photoPickerLauncher =
+    rememberLauncherForActivityResult(
+      contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+      if (uri != null) {
+        onUploadProfilePhoto?.invoke(uri)
+      }
+    }
 
   val members = (membersState as? UiState.Success)?.data.orEmpty()
   val alerts = (alertsState as? UiState.Success)?.data.orEmpty()
@@ -195,22 +210,26 @@ fun HomeScreen(
             ) {
               Box(
                 modifier =
-                  Modifier.size(36.dp)
+                  Modifier.size(38.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(TrackViewGreen.copy(alpha = 0.22f))
-                    .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(10.dp)),
+                    .background(
+                      Brush.verticalGradient(
+                        listOf(Color(0xFF8AC0EE), Color(0xFF3573C6))
+                      )
+                    )
+                    .border(1.dp, Color.White.copy(alpha = 0.35f), RoundedCornerShape(10.dp)),
                 contentAlignment = Alignment.Center,
               ) {
                 Icon(
-                  imageVector = Icons.Default.Shield,
-                  contentDescription = "TrackView Shield Logo",
-                  tint = Color.White,
-                  modifier = Modifier.size(22.dp),
+                  painter = androidx.compose.ui.res.painterResource(id = com.example.R.drawable.ic_launcher_foreground),
+                  contentDescription = "FamLink Logo",
+                  tint = Color.Unspecified,
+                  modifier = Modifier.size(34.dp),
                 )
               }
               Column {
                 Text(
-                  text = "TrackView",
+                  text = "FamLink",
                   style = MaterialTheme.typography.titleLarge,
                   fontWeight = FontWeight.Bold,
                   color = Color.White,
@@ -269,20 +288,46 @@ fun HomeScreen(
                 }
               }
 
-              // Profile Avatar
+              // Profile Avatar (Tap to Upload Photo)
               IconButton(
-                onClick = onOpenSettingsTab,
+                onClick = {
+                  if (onUploadProfilePhoto != null) {
+                    photoPickerLauncher.launch(
+                      PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                  } else {
+                    onOpenSettingsTab()
+                  }
+                },
                 modifier = Modifier.testTag("home_profile_avatar_button"),
               ) {
-                AsyncImage(
-                  model = profile?.avatarUrl ?: Avatars.DAVID,
-                  contentDescription = "Profile Settings",
-                  modifier =
-                    Modifier.size(30.dp)
-                      .clip(CircleShape)
-                      .border(1.5.dp, TrackViewGreen, CircleShape),
-                  contentScale = ContentScale.Crop,
-                )
+                if (!profile?.avatarUrl.isNullOrBlank()) {
+                  AsyncImage(
+                    model = profile?.avatarUrl,
+                    contentDescription = "Profile Photo",
+                    modifier =
+                      Modifier.size(30.dp)
+                        .clip(CircleShape)
+                        .border(1.5.dp, TrackViewGreen, CircleShape),
+                    contentScale = ContentScale.Crop,
+                  )
+                } else {
+                  Box(
+                    modifier =
+                      Modifier.size(30.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.2f))
+                        .border(1.5.dp, TrackViewGreen, CircleShape),
+                    contentAlignment = Alignment.Center,
+                  ) {
+                    Icon(
+                      imageVector = Icons.Default.PhotoCamera,
+                      contentDescription = "Upload Profile Photo",
+                      tint = Color.White,
+                      modifier = Modifier.size(16.dp),
+                    )
+                  }
+                }
               }
 
               Box {
@@ -300,6 +345,16 @@ fun HomeScreen(
                   expanded = showOverflowMenu,
                   onDismissRequest = { showOverflowMenu = false },
                 ) {
+                  DropdownMenuItem(
+                    text = { Text("Upload My Profile Photo") },
+                    leadingIcon = { Icon(Icons.Default.PhotoCamera, contentDescription = null) },
+                    onClick = {
+                      showOverflowMenu = false
+                      photoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                      )
+                    },
+                  )
                   DropdownMenuItem(
                     text = { Text("Pair New Family Device") },
                     leadingIcon = { Icon(Icons.Default.PersonAdd, contentDescription = null) },
@@ -427,6 +482,74 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.testTag("family_circle_horizontal_row"),
               ) {
+                // Logged-in User ("You") Avatar with Photo Upload
+                item {
+                  Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier =
+                      Modifier.width(64.dp)
+                        .clickable {
+                          photoPickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                          )
+                        }
+                        .testTag("circle_avatar_self_upload"),
+                  ) {
+                    Box(contentAlignment = Alignment.BottomEnd) {
+                      if (!profile?.avatarUrl.isNullOrBlank()) {
+                        AsyncImage(
+                          model = profile?.avatarUrl,
+                          contentDescription = "Your Profile Photo",
+                          modifier =
+                            Modifier.size(56.dp)
+                              .clip(CircleShape)
+                              .border(2.5.dp, TrackViewGreen, CircleShape),
+                          contentScale = ContentScale.Crop,
+                        )
+                      } else {
+                        Box(
+                          modifier =
+                            Modifier.size(56.dp)
+                              .clip(CircleShape)
+                              .background(TrackViewGreen.copy(alpha = 0.14f))
+                              .border(2.5.dp, TrackViewGreen, CircleShape),
+                          contentAlignment = Alignment.Center,
+                        ) {
+                          Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Upload Your Photo",
+                            tint = TrackViewTeal,
+                            modifier = Modifier.size(28.dp),
+                          )
+                        }
+                      }
+                      Box(
+                        modifier =
+                          Modifier.size(20.dp)
+                            .clip(CircleShape)
+                            .background(TrackViewGreen)
+                            .border(1.5.dp, MaterialTheme.colorScheme.surface, CircleShape),
+                        contentAlignment = Alignment.Center,
+                      ) {
+                        Icon(
+                          imageVector = Icons.Default.PhotoCamera,
+                          contentDescription = "Upload Photo",
+                          tint = Color.White,
+                          modifier = Modifier.size(11.dp),
+                        )
+                      }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                      text = "You (Photo)",
+                      style = MaterialTheme.typography.labelSmall,
+                      maxLines = 1,
+                      overflow = TextOverflow.Ellipsis,
+                      fontWeight = FontWeight.Bold,
+                      color = TrackViewTeal,
+                    )
+                  }
+                }
                 items(members, key = { "circle_${it.id}" }) { member ->
                   Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -512,7 +635,7 @@ fun HomeScreen(
             val children = members.filter { it.role == "CHILD" }
             val avgChildScreenTimeMins =
               if (children.isNotEmpty()) children.sumOf { it.screenTimeMinutesToday } / children.size
-              else 135
+              else 0
 
             ElevatedCard(
               modifier =
@@ -596,7 +719,7 @@ fun HomeScreen(
                     modifier = Modifier.weight(1f).clickable { onOpenControlsTab() },
                     title = "Screen Time Avg",
                     value = "${avgChildScreenTimeMins / 60}h ${avgChildScreenTimeMins % 60}m",
-                    subtitle = "2 children monitored",
+                    subtitle = "${children.size} children monitored",
                   )
                 }
 
@@ -705,7 +828,9 @@ fun HomeScreen(
                       Text(
                         text =
                           if (liveBannerPaused) "Tap Resume to restore telemetry"
-                          else "Remaining: 42m 18s • High Accuracy GPS",
+                          else if (members.any { it.liveSharing })
+                            "${members.count { it.liveSharing }} paired device(s) sharing live GPS"
+                          else "Pair a family device to share live GPS",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                       )
@@ -774,16 +899,69 @@ fun HomeScreen(
             }
           }
 
-          // 5. WhatsApp-style Family Conversation & Location List
-          items(filteredMembers, key = { it.id }) { member ->
-            FamilyMemberConversationRow(
-              member = member,
-              onClick = { onMemberClick(member) },
-            )
-            HorizontalDivider(
-              modifier = Modifier.padding(start = 82.dp, end = 16.dp),
-              color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f),
-            )
+          // 5. WhatsApp-style Family Conversation & Location List or Empty State
+          if (filteredMembers.isEmpty()) {
+            item {
+              Card(
+                modifier =
+                  Modifier.fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .testTag("home_empty_members_card"),
+                shape = RoundedCornerShape(18.dp),
+                colors =
+                  CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+                  ),
+              ) {
+                Column(
+                  modifier = Modifier.fillMaxWidth().padding(24.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                  Icon(
+                    imageVector = Icons.Default.Devices,
+                    contentDescription = null,
+                    tint = TrackViewTeal,
+                    modifier = Modifier.size(44.dp),
+                  )
+                  Text(
+                    text = "No Paired Family Devices Yet",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                  )
+                  Text(
+                    text =
+                      "Pair your child's or family member's phone to view their live GPS location, SafeZone notifications, and consent-gated camera or voice check-ins.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                  )
+                  Button(
+                    onClick = onOpenPairingModal,
+                    colors = ButtonDefaults.buttonColors(containerColor = TrackViewGreen),
+                    modifier = Modifier.testTag("home_empty_connect_device_btn"),
+                  ) {
+                    Icon(
+                      imageVector = Icons.Default.PersonAdd,
+                      contentDescription = null,
+                      modifier = Modifier.size(18.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Connect a Device", fontWeight = FontWeight.Bold)
+                  }
+                }
+              }
+            }
+          } else {
+            items(filteredMembers, key = { it.id }) { member ->
+              FamilyMemberConversationRow(
+                member = member,
+                onClick = { onMemberClick(member) },
+              )
+              HorizontalDivider(
+                modifier = Modifier.padding(start = 82.dp, end = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f),
+              )
+            }
           }
 
           // 6. Active SafeZones Summary Footer Card
@@ -832,7 +1010,7 @@ fun HomeScreen(
                     Text(
                       text =
                         safeZones.joinToString(" • ") { it.name }.ifBlank {
-                          "Home • Lincoln High • Soccer Academy"
+                          "No SafeZones configured yet — tap to add one"
                         },
                       style = MaterialTheme.typography.bodySmall,
                       color = MaterialTheme.colorScheme.onSurfaceVariant,

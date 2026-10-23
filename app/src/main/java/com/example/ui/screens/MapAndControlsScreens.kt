@@ -249,85 +249,83 @@ fun LiveMapScreen(
         )
       }
 
-      if (showSafeZoneBoundaries) {
+      if (showSafeZoneBoundaries && safeZones.isNotEmpty()) {
         val dashEffect = PathEffect.dashPathEffect(floatArrayOf(16f, 12f), 0f)
-        // Home SafeZone Circle
-        val homeCenter = Offset(w * 0.34f, h * 0.29f)
-        drawCircle(
-          color = Color(0xFF25D366).copy(alpha = 0.16f),
-          radius = 125f,
-          center = homeCenter,
-        )
-        drawCircle(
-          color = Color(0xFF128C7E),
-          radius = 125f,
-          center = homeCenter,
-          style = Stroke(width = 4f, pathEffect = dashEffect),
-        )
-
-        // Lincoln High SafeZone Circle
-        val schoolCenter = Offset(w * 0.68f, h * 0.41f)
-        drawCircle(
-          color = Color(0xFF0284C7).copy(alpha = 0.15f),
-          radius = 115f,
-          center = schoolCenter,
-        )
-        drawCircle(
-          color = Color(0xFF0284C7),
-          radius = 115f,
-          center = schoolCenter,
-          style = Stroke(width = 4f, pathEffect = dashEffect),
-        )
+        safeZones.take(2).forEachIndexed { idx, _ ->
+          val zoneCenter =
+            if (idx == 0) Offset(w * 0.34f, h * 0.29f)
+            else Offset(w * 0.68f, h * 0.41f)
+          val zoneColor = if (idx == 0) Color(0xFF25D366) else Color(0xFF0284C7)
+          drawCircle(
+            color = zoneColor.copy(alpha = 0.16f),
+            radius = 120f,
+            center = zoneCenter,
+          )
+          drawCircle(
+            color = zoneColor,
+            radius = 120f,
+            center = zoneCenter,
+            style = Stroke(width = 4f, pathEffect = dashEffect),
+          )
+        }
       }
 
-      // Pulsing ring around Sarah's Live Marker
-      val sarahCenter = Offset(w * 0.36f, h * 0.31f)
-      drawCircle(
-        color = Color(0xFF25D366).copy(alpha = pulseAlpha),
-        radius = pulseRadius,
-        center = sarahCenter,
-      )
+      // Pulsing ring around active live member marker (only when a real member is sharing)
+      if (activeMember != null && activeMember.liveSharing) {
+        val activeCenter = Offset(w * 0.36f, h * 0.31f)
+        drawCircle(
+          color = Color(0xFF25D366).copy(alpha = pulseAlpha),
+          radius = pulseRadius,
+          center = activeCenter,
+        )
+      }
 
       // Directional heading cone for "You" marker
-      val youCenter = Offset(w * 0.50f, h * 0.48f)
-      val conePath =
-        Path().apply {
-          moveTo(youCenter.x, youCenter.y)
-          lineTo(youCenter.x - 42f, youCenter.y - 95f)
-          lineTo(youCenter.x + 42f, youCenter.y - 95f)
-          close()
-        }
-      drawPath(path = conePath, color = Color(0xFF25D366).copy(alpha = 0.24f))
+      if (deviceLat != 0.0 || deviceLng != 0.0) {
+        val youCenter = Offset(w * 0.50f, h * 0.48f)
+        val conePath =
+          Path().apply {
+            moveTo(youCenter.x, youCenter.y)
+            lineTo(youCenter.x - 42f, youCenter.y - 95f)
+            lineTo(youCenter.x + 42f, youCenter.y - 95f)
+            close()
+          }
+        drawPath(path = conePath, color = Color(0xFF25D366).copy(alpha = 0.24f))
+      }
     }
 
-    // 3. SafeZone Floating Labels on Map
-    if (showSafeZoneBoundaries) {
-      Surface(
-        color = TrackViewDarkGreen.copy(alpha = 0.88f),
-        shape = RoundedCornerShape(50),
-        modifier = Modifier.align(Alignment.TopStart).offset(x = 36.dp, y = 165.dp),
-      ) {
-        Text(
-          text = "Home SafeZone • 250m",
-          style = MaterialTheme.typography.labelSmall,
-          color = Color.White,
-          fontWeight = FontWeight.Bold,
-          modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-        )
+    // 3. SafeZone Floating Labels on Map (only for real SafeZones)
+    if (showSafeZoneBoundaries && safeZones.isNotEmpty()) {
+      safeZones.getOrNull(0)?.let { firstZone ->
+        Surface(
+          color = TrackViewDarkGreen.copy(alpha = 0.88f),
+          shape = RoundedCornerShape(50),
+          modifier = Modifier.align(Alignment.TopStart).offset(x = 36.dp, y = 165.dp),
+        ) {
+          Text(
+            text = "${firstZone.name} • ${firstZone.radiusMeters}m",
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+          )
+        }
       }
 
-      Surface(
-        color = Color(0xFF0369A1).copy(alpha = 0.9f),
-        shape = RoundedCornerShape(50),
-        modifier = Modifier.align(Alignment.TopEnd).offset(x = (-32).dp, y = 230.dp),
-      ) {
-        Text(
-          text = "Lincoln High SafeZone • 300m",
-          style = MaterialTheme.typography.labelSmall,
-          color = Color.White,
-          fontWeight = FontWeight.Bold,
-          modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-        )
+      safeZones.getOrNull(1)?.let { secondZone ->
+        Surface(
+          color = Color(0xFF0369A1).copy(alpha = 0.9f),
+          shape = RoundedCornerShape(50),
+          modifier = Modifier.align(Alignment.TopEnd).offset(x = (-32).dp, y = 230.dp),
+        ) {
+          Text(
+            text = "${secondZone.name} • ${secondZone.radiusMeters}m",
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+          )
+        }
       }
     }
 
@@ -1004,56 +1002,93 @@ fun ParentalControlsScreen(
       contentPadding = PaddingValues(16.dp),
       verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-      // 1. Child / Family Member Selector
-      item {
-        Text(
-          text = "SELECT FAMILY DEVICE",
-          style = MaterialTheme.typography.labelSmall,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          fontWeight = FontWeight.Bold,
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-          items(controllableMembers, key = { "ctrl_${it.id}" }) { member ->
-            val selected = activeChild?.id == member.id
-            Surface(
-              shape = RoundedCornerShape(14.dp),
-              color =
-                if (selected) TrackViewGreen.copy(alpha = 0.18f)
-                else MaterialTheme.colorScheme.surface,
-              border =
-                androidx.compose.foundation.BorderStroke(
-                  width = if (selected) 2.dp else 1.dp,
-                  color =
-                    if (selected) TrackViewGreen
-                    else MaterialTheme.colorScheme.outlineVariant,
-                ),
-              modifier =
-                Modifier.clickable { onSelectMember(member.id) }
-                  .testTag("controls_member_chip_${member.id}"),
+      // 1. Child / Family Member Selector or Empty State
+      if (controllableMembers.isEmpty()) {
+        item {
+          Card(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+            shape = RoundedCornerShape(18.dp),
+            colors =
+              CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+              ),
+          ) {
+            Column(
+              modifier = Modifier.fillMaxWidth().padding(24.dp),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-              Row(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+              Icon(
+                imageVector = Icons.Default.Security,
+                contentDescription = null,
+                tint = TrackViewTeal,
+                modifier = Modifier.size(48.dp),
+              )
+              Text(
+                text = "No Paired Child Devices Yet",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+              )
+              Text(
+                text =
+                  "Pair your child's phone from the Home or Devices tab to manage daily screen time limits, bedtime schedules, and location sharing.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+              )
+            }
+          }
+        }
+      } else {
+        item {
+          Text(
+            text = "SELECT FAMILY DEVICE",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontWeight = FontWeight.Bold,
+          )
+          Spacer(modifier = Modifier.height(8.dp))
+          LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(controllableMembers, key = { "ctrl_${it.id}" }) { member ->
+              val selected = activeChild?.id == member.id
+              Surface(
+                shape = RoundedCornerShape(14.dp),
+                color =
+                  if (selected) TrackViewGreen.copy(alpha = 0.18f)
+                  else MaterialTheme.colorScheme.surface,
+                border =
+                  androidx.compose.foundation.BorderStroke(
+                    width = if (selected) 2.dp else 1.dp,
+                    color =
+                      if (selected) TrackViewGreen
+                      else MaterialTheme.colorScheme.outlineVariant,
+                  ),
+                modifier =
+                  Modifier.clickable { onSelectMember(member.id) }
+                    .testTag("controls_member_chip_${member.id}"),
               ) {
-                AsyncImage(
-                  model = member.avatarUrl.ifBlank { Avatars.LUCAS },
-                  contentDescription = member.name,
-                  modifier = Modifier.size(32.dp).clip(CircleShape),
-                  contentScale = ContentScale.Crop,
-                )
-                Column {
-                  Text(
-                    text = member.name,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
+                Row(
+                  modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                  AsyncImage(
+                    model = member.avatarUrl.ifBlank { Avatars.LUCAS },
+                    contentDescription = member.name,
+                    modifier = Modifier.size(32.dp).clip(CircleShape),
+                    contentScale = ContentScale.Crop,
                   )
-                  Text(
-                    text = "${member.role} • ${member.batteryLevel}%",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                  )
+                  Column {
+                    Text(
+                      text = member.name,
+                      style = MaterialTheme.typography.labelLarge,
+                      fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                      text = "${member.role} • ${member.batteryLevel}%",
+                      style = MaterialTheme.typography.labelSmall,
+                      color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                  }
                 }
               }
             }
@@ -1301,7 +1336,7 @@ fun ParentalControlsScreen(
           }
         }
 
-        // 4. Activity Report Summary Card
+        // 4. Activity Report Summary Card (real telemetry only)
         if (showActivityReportExpanded) {
           item {
             Card(
@@ -1314,20 +1349,20 @@ fun ParentalControlsScreen(
             ) {
               Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                  text = "7-Day Activity Report • ${activeChild.name}",
+                  text = "Live Telemetry Summary • ${activeChild.name}",
                   style = MaterialTheme.typography.titleSmall,
                   fontWeight = FontWeight.Bold,
                 )
                 Text(
-                  text = "• SafeZone Check-Ins: 14 verified arrivals (Home & Lincoln High)",
+                  text = "• Current Location Status: ${activeChild.locationLabel.ifBlank { "No GPS fix reported yet" }}",
                   style = MaterialTheme.typography.bodySmall,
                 )
                 Text(
-                  text = "• Top Apps: Google Classroom (4h 10m), Duolingo (2h 05m), YouTube Kids (1h 40m)",
+                  text = "• Screen Time Today: ${activeChild.screenTimeMinutesToday / 60}h ${activeChild.screenTimeMinutesToday % 60}m (Limit: ${activeChild.screenTimeLimitMinutes / 60}h ${activeChild.screenTimeLimitMinutes % 60}m)",
                   style = MaterialTheme.typography.bodySmall,
                 )
                 Text(
-                  text = "• Blocked Web Attempts: 0 harmful domains accessed this week",
+                  text = "• Device Status: ${if (activeChild.online) "Online" else "Offline"} • Battery: ${activeChild.batteryLevel}%",
                   style = MaterialTheme.typography.bodySmall,
                   color = TrackViewTeal,
                   fontWeight = FontWeight.SemiBold,

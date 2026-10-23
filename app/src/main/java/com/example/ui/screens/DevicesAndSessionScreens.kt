@@ -250,19 +250,70 @@ fun DevicesScreen(
             }
           }
 
-          // Device Cards List
-          items(devices, key = { it.deviceId }) { device ->
-            val isCurrentPhone = device.deviceId == currentDeviceId
-            UserDeviceCard(
-              device = device,
-              isCurrentPhone = isCurrentPhone,
-              onLocate = { onLocateDevice(device) },
-              onRequestCamera = { onRequestCamera(device) },
-              onRequestVoice = { onRequestVoice(device) },
-              onRename = { renamingDevice = device },
-              onRevoke = { revokingDevice = device },
-              onUpdateConsent = { loc, cam, mic -> onUpdateConsent(device, loc, cam, mic) },
-            )
+          // Device Cards List or Empty State
+          if (devices.isEmpty()) {
+            item {
+              Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+                shape = RoundedCornerShape(18.dp),
+                colors =
+                  CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+                  ),
+              ) {
+                Column(
+                  modifier = Modifier.fillMaxWidth().padding(24.dp),
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                  Icon(
+                    imageVector = Icons.Default.Devices,
+                    contentDescription = null,
+                    tint = TrackViewTeal,
+                    modifier = Modifier.size(48.dp),
+                  )
+                  Text(
+                    text = "No Paired Devices Yet",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                  )
+                  Text(
+                    text =
+                      "Pair your child's phone using an expiring pairing code or QR code to enable live location sharing and consent-gated camera/voice check-ins.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                  )
+                  Button(
+                    onClick = { showPairingModal = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = TrackViewGreen),
+                    modifier = Modifier.testTag("empty_devices_pair_btn"),
+                  ) {
+                    Icon(
+                      imageVector = Icons.Default.QrCode2,
+                      contentDescription = null,
+                      modifier = Modifier.size(18.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Connect a Device", fontWeight = FontWeight.Bold)
+                  }
+                }
+              }
+            }
+          } else {
+            items(devices, key = { it.deviceId }) { device ->
+              val isCurrentPhone = device.deviceId == currentDeviceId
+              UserDeviceCard(
+                device = device,
+                isCurrentPhone = isCurrentPhone,
+                onLocate = { onLocateDevice(device) },
+                onRequestCamera = { onRequestCamera(device) },
+                onRequestVoice = { onRequestVoice(device) },
+                onRename = { renamingDevice = device },
+                onRevoke = { revokingDevice = device },
+                onUpdateConsent = { loc, cam, mic -> onUpdateConsent(device, loc, cam, mic) },
+              )
+            }
           }
         }
       }
@@ -671,8 +722,9 @@ fun PairPhoneDialog(
   onDismiss: () -> Unit,
   onConfirmPair: (name: String, pairingCode: String) -> Unit = { _, _ -> },
 ) {
-  var code by rememberSaveable { mutableStateOf("TV-7821") }
+  var code by rememberSaveable { mutableStateOf("FL-" + (1000..9999).random()) }
   var phoneName by rememberSaveable { mutableStateOf("") }
+  var isChildEntryMode by rememberSaveable { mutableStateOf(false) }
 
   AlertDialog(
     onDismissRequest = onDismiss,
@@ -682,7 +734,7 @@ fun PairPhoneDialog(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
       ) {
         Icon(Icons.Default.PhoneAndroid, contentDescription = null, tint = TrackViewTeal)
-        Text("Connect Another Phone", fontWeight = FontWeight.Bold)
+        Text("Parent & Child Device Pairing", fontWeight = FontWeight.Bold)
       }
     },
     text = {
@@ -691,53 +743,115 @@ fun PairPhoneDialog(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier.fillMaxWidth(),
       ) {
-        Box(
-          modifier =
-            Modifier.size(130.dp)
-              .clip(RoundedCornerShape(14.dp))
-              .background(TrackViewGreen.copy(alpha = 0.12f))
-              .border(1.5.dp, TrackViewGreen, RoundedCornerShape(14.dp)),
-          contentAlignment = Alignment.Center,
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-          Icon(
-            imageVector = Icons.Default.QrCode2,
-            contentDescription = "Pairing QR",
-            tint = TrackViewDarkGreen,
-            modifier = Modifier.size(96.dp),
-          )
+          Button(
+            onClick = { isChildEntryMode = false },
+            colors =
+              ButtonDefaults.buttonColors(
+                containerColor =
+                  if (!isChildEntryMode) TrackViewGreen
+                  else MaterialTheme.colorScheme.surfaceVariant,
+                contentColor =
+                  if (!isChildEntryMode) Color.White
+                  else MaterialTheme.colorScheme.onSurfaceVariant,
+              ),
+            modifier = Modifier.weight(1f),
+          ) {
+            Text("Parent (Generate)", style = MaterialTheme.typography.labelSmall)
+          }
+          Button(
+            onClick = { isChildEntryMode = true },
+            colors =
+              ButtonDefaults.buttonColors(
+                containerColor =
+                  if (isChildEntryMode) TrackViewGreen
+                  else MaterialTheme.colorScheme.surfaceVariant,
+                contentColor =
+                  if (isChildEntryMode) Color.White
+                  else MaterialTheme.colorScheme.onSurfaceVariant,
+              ),
+            modifier = Modifier.weight(1f),
+          ) {
+            Text("Child (Enter Code)", style = MaterialTheme.typography.labelSmall)
+          }
         }
 
-        Text(
-          text = "Expiring Pairing Code: $code",
-          style = MaterialTheme.typography.titleMedium,
-          fontFamily = FontFamily.Monospace,
-          fontWeight = FontWeight.Bold,
-          color = TrackViewTeal,
-        )
+        if (!isChildEntryMode) {
+          Box(
+            modifier =
+              Modifier.size(120.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(TrackViewGreen.copy(alpha = 0.12f))
+                .border(1.5.dp, TrackViewGreen, RoundedCornerShape(14.dp)),
+            contentAlignment = Alignment.Center,
+          ) {
+            Icon(
+              imageVector = Icons.Default.QrCode2,
+              contentDescription = "Pairing QR",
+              tint = TrackViewDarkGreen,
+              modifier = Modifier.size(88.dp),
+            )
+          }
 
-        Text(
-          text =
-            "Open TrackView on your second phone and scan this QR code or enter code $code to link under your verified Google Account.",
-          style = MaterialTheme.typography.bodySmall,
-          textAlign = TextAlign.Center,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+          Text(
+            text = "Expiring Pairing Code: $code",
+            style = MaterialTheme.typography.titleMedium,
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+            color = TrackViewTeal,
+          )
 
-        OutlinedTextField(
-          value = phoneName,
-          onValueChange = { phoneName = it },
-          label = { Text("Friendly Name (e.g. Work Phone)") },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth(),
-        )
+          Text(
+            text =
+              "Install FamLink on your child's phone and enter code $code to link their device with explicit consent.",
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+
+          OutlinedTextField(
+            value = phoneName,
+            onValueChange = { phoneName = it },
+            label = { Text("Child Device Name (e.g. Child's Phone)") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+          )
+        } else {
+          Text(
+            text =
+              "Enter the pairing code displayed on the Parent device to authorize location sharing and consent-gated session requests on this phone.",
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+
+          OutlinedTextField(
+            value = code,
+            onValueChange = { code = it.uppercase() },
+            label = { Text("Enter Parent Pairing Code (e.g. FL-1234)") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+          )
+
+          OutlinedTextField(
+            value = phoneName,
+            onValueChange = { phoneName = it },
+            label = { Text("This Phone's Name") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+          )
+        }
       }
     },
     confirmButton = {
       Button(
-        onClick = { onConfirmPair(phoneName, code) },
+        onClick = { onConfirmPair(phoneName.ifBlank { "Child Device" }, code) },
         colors = ButtonDefaults.buttonColors(containerColor = TrackViewGreen),
       ) {
-        Text("Done")
+        Text(if (isChildEntryMode) "Approve & Pair Phone" else "Register Pairing Code")
       }
     },
     dismissButton = {
@@ -923,13 +1037,36 @@ fun RemoteSessionActiveScreen(
           modifier = Modifier.fillMaxSize(),
         )
       } else {
-        // High quality simulated remote video stream with animated noise/radar overlay
-        AsyncImage(
-          model = Avatars.MAP_BG,
-          contentDescription = "Remote Camera Stream",
-          modifier = Modifier.fillMaxSize(),
-          contentScale = ContentScale.Crop,
-        )
+        // Honest permission-denied / waiting for camera approval state (never show fake video)
+        Box(
+          modifier = Modifier.fillMaxSize().padding(32.dp),
+          contentAlignment = Alignment.Center,
+        ) {
+          Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+          ) {
+            Icon(
+              imageVector = Icons.Default.VideocamOff,
+              contentDescription = "Camera Permission Needed",
+              tint = Color.White,
+              modifier = Modifier.size(56.dp),
+            )
+            Text(
+              text = "Camera Access Required",
+              style = MaterialTheme.typography.titleLarge,
+              color = Color.White,
+              fontWeight = FontWeight.Bold,
+            )
+            Text(
+              text =
+                "Live video cannot be displayed until the receiving device grants Android Camera permission and approves the WebRTC session.",
+              style = MaterialTheme.typography.bodyMedium,
+              color = Color.White.copy(alpha = 0.8f),
+              textAlign = TextAlign.Center,
+            )
+          }
+        }
       }
 
       // Dark gradient overlay top and bottom for controls

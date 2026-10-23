@@ -51,13 +51,71 @@ class TrackViewRepository(
 
   private fun userDocRef(uid: String) = db.collection("users").document(uid)
 
+  private val legacyDemoMemberIds =
+    setOf(
+      "member_sarah",
+      "member_lucas",
+      "member_emma",
+      "member_marcus",
+      "member_family_hub",
+      "member_guardian_bot",
+    )
+  private val legacyDemoDeviceIds =
+    setOf(
+      "pixel_8_pro",
+      "galaxy_s24_ultra",
+      "ipad_mini_car",
+    )
+  private val legacyDemoZoneIds =
+    setOf(
+      "zone_home",
+      "zone_school",
+      "zone_soccer",
+    )
+  private val legacyDemoAlertIds =
+    setOf(
+      "alert_1",
+      "alert_2",
+      "alert_3",
+      "alert_4",
+      "alert_5",
+    )
+  private val legacyDemoMsgIds =
+    setOf(
+      "msg_sarah_1",
+      "msg_sarah_2",
+      "msg_sarah_3",
+      "msg_sarah_4",
+      "msg_lucas_1",
+      "msg_lucas_2",
+      "msg_lucas_3",
+      "msg_emma_1",
+      "msg_emma_2",
+      "msg_hub_1",
+      "msg_hub_2",
+    )
+
+  private fun isLegacyDemoMember(m: FamilyMember): Boolean {
+    return m.id in legacyDemoMemberIds ||
+      m.name.contains("Miller", ignoreCase = true) ||
+      m.name.contains("Family Shield Bot", ignoreCase = true)
+  }
+
   fun observeUserProfile(userId: String): Flow<UserProfile?> {
     val path = "users/$userId"
     return userDocRef(userId)
       .snapshots()
       .map { snapshot ->
         if (snapshot.exists()) {
-          snapshot.toObject(UserProfile::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+          val raw = snapshot.toObject(UserProfile::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+          if (raw != null && raw.displayName.equals("David Miller", ignoreCase = true)) {
+            raw.copy(
+              displayName = auth.currentUser?.displayName?.takeIf { it.isNotBlank() } ?: "FamLink User",
+              avatarUrl = auth.currentUser?.photoUrl?.toString().orEmpty(),
+            )
+          } else {
+            raw
+          }
         } else {
           null
         }
@@ -76,6 +134,7 @@ class TrackViewRepository(
       .map { snapshot ->
         snapshot
           .toObjects(FamilyMember::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+          .filterNot { isLegacyDemoMember(it) }
           .sortedWith(compareByDescending<FamilyMember> { it.pinned }.thenBy { it.name })
       }
       .catch { error ->
@@ -93,6 +152,7 @@ class TrackViewRepository(
       .map { snapshot ->
         snapshot
           .toObjects(ChatMessage::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+          .filterNot { it.id in legacyDemoMsgIds || it.memberId in legacyDemoMemberIds }
           .sortedBy { it.createdAt ?: Timestamp(0, 0) }
       }
       .catch { error ->
@@ -109,6 +169,11 @@ class TrackViewRepository(
       .map { snapshot ->
         snapshot
           .toObjects(SafetyAlert::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+          .filterNot {
+            it.id in legacyDemoAlertIds ||
+              it.memberName.contains("Miller", ignoreCase = true) ||
+              it.memberName in setOf("Lucas", "Emma", "Sarah", "Marcus", "Noah")
+          }
           .sortedByDescending { it.createdAt ?: Timestamp(0, 0) }
       }
       .catch { error ->
@@ -125,6 +190,12 @@ class TrackViewRepository(
       .map { snapshot ->
         snapshot
           .toObjects(SafeZone::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+          .filterNot {
+            it.id in legacyDemoZoneIds ||
+              it.address.contains("1428 Elm Street", ignoreCase = true) ||
+              it.address.contains("800 Academic Way", ignoreCase = true) ||
+              it.address.contains("350 Parkside Blvd", ignoreCase = true)
+          }
           .sortedBy { it.name }
       }
       .catch { error ->
@@ -141,6 +212,11 @@ class TrackViewRepository(
       .map { snapshot ->
         snapshot
           .toObjects(UserDevice::class.java, DocumentSnapshot.ServerTimestampBehavior.ESTIMATE)
+          .filterNot {
+            it.deviceId in legacyDemoDeviceIds ||
+              it.id in legacyDemoDeviceIds ||
+              it.name.contains("Miller", ignoreCase = true)
+          }
           .sortedBy { it.name }
       }
       .catch { error ->
@@ -631,477 +707,252 @@ class TrackViewRepository(
     userRef.delete().await()
   }
 
-  suspend fun ensureInitialDataSeeded(displayName: String?, email: String?): Result<Unit> =
+  suspend fun ensureRealUserInitialized(
+    displayName: String?,
+    email: String?,
+    photoUrl: String? = null,
+    currentDeviceId: String = "device_primary",
+    currentDeviceName: String = "This Phone",
+    currentDeviceModel: String = "Android Device",
+  ): Result<Unit> = runCatching {
+    val uid = requireUserId()
+    val profileRef = userDocRef(uid)
+
+    // 1. Purge any legacy demo documents that were seeded by earlier versions of the app
     runCatching {
-      val uid = requireUserId()
-      val profileRef = userDocRef(uid)
-      val existingProfile = profileRef.get().await()
-      if (!existingProfile.exists()) {
-        val initialProfile =
-          UserProfile(
-            userId = uid,
-            displayName = (displayName?.takeIf { it.isNotBlank() } ?: "David Miller").take(80),
-            email = (email?.takeIf { it.isNotBlank() } ?: "david.miller@family.org").take(150),
-            avatarUrl = Avatars.DAVID,
-            statusMessage = "Available • Location shared with Family",
-            ghostModeEnabled = false,
-            shareBatteryStatus = true,
-            darkModeMapStyling = false,
-            speedUnit = "MPH",
-            planTier = "FREE",
-          )
-        createOrUpdateUserProfile(initialProfile).getOrThrow()
+      for (demoId in legacyDemoMemberIds) {
+        profileRef.collection("members").document(demoId).delete()
       }
-
-      val existingMembers = profileRef.collection("members").get().await()
-      if (existingMembers.isEmpty) {
-        val defaultMembers =
-          listOf(
-            "sarah_miller" to
-              FamilyMember(
-                userId = uid,
-                name = "Sarah Miller",
-                role = "SPOUSE",
-                avatarUrl = Avatars.SARAH,
-                online = true,
-                liveSharing = true,
-                pinned = true,
-                favorite = true,
-                batteryLevel = 84,
-                speedMph = 24,
-                locationLabel = "Moving along Grand Ave • 8 min ETA",
-                lastMessageSnippet = "Live: 84% battery • 24 mph on I-80",
-                lastActivityTimeLabel = "10:42 AM",
-                unreadCount = 0,
-                screenTimeMinutesToday = 115,
-                screenTimeLimitMinutes = 300,
-                latitude = 41.8917,
-                longitude = -87.6243,
-                accuracyMeters = 5,
-                notifyOnSchoolDeparture = true,
-                ghostMode = false,
-                appRestrictionsEnabled = false,
-                websiteSafetyEnabled = true,
-                bedtimeSchedule = "11:00 PM - 6:30 AM",
-                pairingCode = "TV-8841",
-              ),
-            "miller_family_hub" to
-              FamilyMember(
-                userId = uid,
-                name = "Miller Family Hub",
-                role = "GROUP",
-                avatarUrl = Avatars.DAVID,
-                online = true,
-                liveSharing = true,
-                pinned = false,
-                favorite = true,
-                batteryLevel = 92,
-                speedMph = 0,
-                locationLabel = "Westside High School SafeZone",
-                lastMessageSnippet = "Dad: Just arrived at Westside High School",
-                lastActivityTimeLabel = "9:15 AM",
-                unreadCount = 2,
-                screenTimeMinutesToday = 45,
-                screenTimeLimitMinutes = 240,
-                latitude = 41.9102,
-                longitude = -87.6510,
-                accuracyMeters = 6,
-                notifyOnSchoolDeparture = true,
-                ghostMode = false,
-                appRestrictionsEnabled = false,
-                websiteSafetyEnabled = true,
-                bedtimeSchedule = "10:00 PM - 6:30 AM",
-                pairingCode = "TV-1001",
-              ),
-            "lucas_miller" to
-              FamilyMember(
-                userId = uid,
-                name = "Lucas Miller",
-                role = "CHILD",
-                avatarUrl = Avatars.LUCAS,
-                online = true,
-                liveSharing = true,
-                pinned = false,
-                favorite = true,
-                batteryLevel = 91,
-                speedMph = 0,
-                locationLabel = "Lincoln Park • At School (since 8:15 AM)",
-                lastMessageSnippet = "Can you pick me up from soccer practice?",
-                lastActivityTimeLabel = "Yesterday",
-                unreadCount = 1,
-                screenTimeMinutesToday = 135,
-                screenTimeLimitMinutes = 150,
-                latitude = 41.9255,
-                longitude = -87.6385,
-                accuracyMeters = 4,
-                notifyOnSchoolDeparture = true,
-                ghostMode = false,
-                appRestrictionsEnabled = true,
-                websiteSafetyEnabled = true,
-                bedtimeSchedule = "9:30 PM - 6:45 AM",
-                pairingCode = "TV-3049",
-              ),
-            "emma_miller" to
-              FamilyMember(
-                userId = uid,
-                name = "Emma Miller",
-                role = "CHILD",
-                avatarUrl = Avatars.EMMA,
-                online = false,
-                liveSharing = false,
-                pinned = false,
-                favorite = true,
-                batteryLevel = 64,
-                speedMph = 0,
-                locationLabel = "Central City Library (Study Room 3)",
-                lastMessageSnippet = "Location: Central City Library (Study Room 3)",
-                lastActivityTimeLabel = "Yesterday",
-                unreadCount = 0,
-                screenTimeMinutesToday = 160,
-                screenTimeLimitMinutes = 180,
-                latitude = 41.8762,
-                longitude = -87.6281,
-                accuracyMeters = 8,
-                notifyOnSchoolDeparture = true,
-                ghostMode = true,
-                appRestrictionsEnabled = true,
-                websiteSafetyEnabled = true,
-                bedtimeSchedule = "10:00 PM - 6:30 AM",
-                pairingCode = "TV-7192",
-              ),
-            "marcus_miller" to
-              FamilyMember(
-                userId = uid,
-                name = "Marcus Miller",
-                role = "SIBLING",
-                avatarUrl = Avatars.MARCUS,
-                online = true,
-                liveSharing = false,
-                pinned = false,
-                favorite = false,
-                batteryLevel = 78,
-                speedMph = 0,
-                locationLabel = "Downtown River North",
-                lastMessageSnippet = "Voice message (0:24)",
-                lastActivityTimeLabel = "Tuesday",
-                unreadCount = 0,
-                screenTimeMinutesToday = 90,
-                screenTimeLimitMinutes = 360,
-                latitude = 41.8924,
-                longitude = -87.6341,
-                accuracyMeters = 7,
-                notifyOnSchoolDeparture = false,
-                ghostMode = false,
-                appRestrictionsEnabled = false,
-                websiteSafetyEnabled = false,
-                bedtimeSchedule = "11:30 PM - 7:00 AM",
-                pairingCode = "TV-5518",
-              ),
-            "safezone_bot" to
-              FamilyMember(
-                userId = uid,
-                name = "SafeZone Alert Bot",
-                role = "BOT",
-                avatarUrl = Avatars.LOGO,
-                online = true,
-                liveSharing = true,
-                pinned = false,
-                favorite = false,
-                batteryLevel = 100,
-                speedMph = 0,
-                locationLabel = "All 3 SafeZones Protected",
-                lastMessageSnippet = "Lucas entered SafeZone \"Home\" safely at 3:45 PM",
-                lastActivityTimeLabel = "Monday",
-                unreadCount = 0,
-                screenTimeMinutesToday = 0,
-                screenTimeLimitMinutes = 1440,
-                latitude = 41.9028,
-                longitude = -87.6315,
-                accuracyMeters = 1,
-                notifyOnSchoolDeparture = true,
-                ghostMode = false,
-                appRestrictionsEnabled = false,
-                websiteSafetyEnabled = true,
-                bedtimeSchedule = "Always Active",
-                pairingCode = "TV-SAFE",
-              ),
-          )
-        for ((docId, member) in defaultMembers) {
-          addFamilyMember(member, docId).getOrThrow()
-        }
-
-        val sarahMessages =
-          listOf(
-            ChatMessage(
-              userId = uid,
-              memberId = "sarah_miller",
-              senderName = "Sarah Miller",
-              outgoing = false,
-              text = "Hey! Leaving the downtown office now, heading towards 5th Avenue.",
-              messageType = "TEXT",
-              timeLabel = "10:30 AM",
-            ),
-            ChatMessage(
-              userId = uid,
-              memberId = "sarah_miller",
-              senderName = "You",
-              outgoing = true,
-              text =
-                "Sounds good! Traffic is heavy on Main St. Can you share your live location so I know when dinner should be ready?",
-              messageType = "TEXT",
-              timeLabel = "10:32 AM",
-            ),
-            ChatMessage(
-              userId = uid,
-              memberId = "sarah_miller",
-              senderName = "Sarah Miller",
-              outgoing = false,
-              text = "Downtown → 5th Ave (ETA 14 min) • 24 mph • 5m acc • 82% battery",
-              messageType = "LIVE_LOCATION",
-              timeLabel = "10:35 AM",
-            ),
-            ChatMessage(
-              userId = uid,
-              memberId = "sarah_miller",
-              senderName = "You",
-              outgoing = true,
-              text = "Got it, see you moving. Drive safe!",
-              messageType = "TEXT",
-              timeLabel = "10:36 AM",
-            ),
-            ChatMessage(
-              userId = uid,
-              memberId = "sarah_miller",
-              senderName = "SafeZone Monitor",
-              outgoing = false,
-              text = "Sarah crossed Broadway Hub (3.2 mi away)",
-              messageType = "GEOFENCE_EVENT",
-              timeLabel = "10:38 AM",
-            ),
-          )
-        for ((idx, msg) in sarahMessages.withIndex()) {
-          profileRef
-            .collection("messages")
-            .document("sarah_msg_${idx + 1}")
-            .set(msg.toWriteMap(uid))
-            .await()
-        }
-
-        val lucasMessages =
-          listOf(
-            ChatMessage(
-              userId = uid,
-              memberId = "lucas_miller",
-              senderName = "Lucas Miller",
-              outgoing = false,
-              text = "Arrived at Lincoln High School SafeZone (91% battery)",
-              messageType = "STATIC_PIN",
-              timeLabel = "8:15 AM",
-            ),
-            ChatMessage(
-              userId = uid,
-              memberId = "lucas_miller",
-              senderName = "Lucas Miller",
-              outgoing = false,
-              text = "Can you pick me up from soccer practice?",
-              messageType = "TEXT",
-              timeLabel = "Yesterday",
-            ),
-          )
-        for ((idx, msg) in lucasMessages.withIndex()) {
-          profileRef
-            .collection("messages")
-            .document("lucas_msg_${idx + 1}")
-            .set(msg.toWriteMap(uid))
-            .await()
-        }
+      for (demoDevId in legacyDemoDeviceIds) {
+        profileRef.collection("devices").document(demoDevId).delete()
       }
-
-      val existingZones = profileRef.collection("safezones").get().await()
-      if (existingZones.isEmpty) {
-        val defaultZones =
-          listOf(
-            "zone_home" to
-              SafeZone(
-                userId = uid,
-                name = "Home SafeZone",
-                address = "742 Evergreen Terrace, Lincoln Park",
-                radiusMeters = 250,
-                latitude = 41.9214,
-                longitude = -87.6513,
-                notifyOnArrival = true,
-                notifyOnDeparture = true,
-              ),
-            "zone_school" to
-              SafeZone(
-                userId = uid,
-                name = "Lincoln High SafeZone",
-                address = "2001 N Orchard St, Chicago, IL",
-                radiusMeters = 300,
-                latitude = 41.9185,
-                longitude = -87.6412,
-                notifyOnArrival = true,
-                notifyOnDeparture = true,
-              ),
-            "zone_soccer" to
-              SafeZone(
-                userId = uid,
-                name = "Soccer Academy",
-                address = "Montrose Harbor Athletic Fields",
-                radiusMeters = 350,
-                latitude = 41.9635,
-                longitude = -87.6380,
-                notifyOnArrival = true,
-                notifyOnDeparture = true,
-              ),
-          )
-        for ((docId, zone) in defaultZones) {
-          addSafeZone(zone, docId).getOrThrow()
-        }
+      for (demoZoneId in legacyDemoZoneIds) {
+        profileRef.collection("safezones").document(demoZoneId).delete()
       }
-
-      val existingAlerts = profileRef.collection("alerts").get().await()
-      if (existingAlerts.isEmpty) {
-        val defaultAlerts =
-          listOf(
-            "alert_1" to
-              SafetyAlert(
-                userId = uid,
-                memberName = "Lucas Miller",
-                alertType = "ARRIVAL",
-                title = "Arrived at Lincoln High SafeZone",
-                description = "Lucas entered Lincoln High School perimeter at 8:15 AM (91% battery).",
-                timeLabel = "8:15 AM",
-                read = false,
-              ),
-            "alert_2" to
-              SafetyAlert(
-                userId = uid,
-                memberName = "Sarah Miller",
-                alertType = "DEPARTURE",
-                title = "Departed Downtown Office",
-                description = "Sarah started a 1-hour live route share heading toward 5th Ave.",
-                timeLabel = "10:30 AM",
-                read = false,
-              ),
-            "alert_3" to
-              SafetyAlert(
-                userId = uid,
-                memberName = "Lucas Miller",
-                alertType = "SCREEN_TIME",
-                title = "Screen Time Approaching Daily Limit",
-                description = "Lucas has used 2h 15m of his 2h 30m daily allowance on school apps & games.",
-                timeLabel = "Yesterday",
-                read = false,
-              ),
-            "alert_4" to
-              SafetyAlert(
-                userId = uid,
-                memberName = "Emma Miller",
-                alertType = "OFFLINE",
-                title = "Ghost Mode Paused Location",
-                description = "Emma paused live location sharing near Central City Library.",
-                timeLabel = "2h ago",
-                read = true,
-              ),
-            "alert_5" to
-              SafetyAlert(
-                userId = uid,
-                memberName = "Emma Miller",
-                alertType = "LOW_BATTERY",
-                title = "Battery Saver Triggered",
-                description = "Emma's device dropped to 18% during evening study session.",
-                timeLabel = "Yesterday",
-                read = true,
-              ),
-            "alert_6" to
-              SafetyAlert(
-                userId = uid,
-                memberName = "Lucas Miller",
-                alertType = "BEDTIME",
-                title = "Bedtime Schedule Enforced",
-                description = "Child device locked for scheduled rest (9:30 PM - 6:45 AM).",
-                timeLabel = "Last night",
-                read = true,
-              ),
-          )
-        for ((docId, alert) in defaultAlerts) {
-          addSafetyAlert(alert, docId).getOrThrow()
-        }
+      for (demoAlertId in legacyDemoAlertIds) {
+        profileRef.collection("alerts").document(demoAlertId).delete()
       }
-
-      val existingDevices = profileRef.collection("devices").get().await()
-      if (existingDevices.isEmpty) {
-        val defaultDevices =
-          listOf(
-            "pixel_8_pro" to
-              UserDevice(
-                deviceId = "pixel_8_pro",
-                userId = uid,
-                name = "Pixel 8 Pro (This Phone)",
-                model = "Google Pixel 8 Pro",
-                online = true,
-                batteryLevel = 94,
-                latitude = 41.9214,
-                longitude = -87.6513,
-                accuracyMeters = 4,
-                locationSharingApproved = true,
-                cameraSessionApproved = true,
-                microphoneApproved = true,
-                pairingCode = "TV-8841",
-              ),
-            "samsung_s24" to
-              UserDevice(
-                deviceId = "samsung_s24",
-                userId = uid,
-                name = "Galaxy S24 (Sarah's Phone)",
-                model = "Samsung SM-S928B",
-                online = true,
-                batteryLevel = 84,
-                latitude = 41.8917,
-                longitude = -87.6243,
-                accuracyMeters = 5,
-                locationSharingApproved = true,
-                cameraSessionApproved = true,
-                microphoneApproved = true,
-                pairingCode = "TV-1002",
-              ),
-            "iphone_lucas" to
-              UserDevice(
-                deviceId = "iphone_lucas",
-                userId = uid,
-                name = "iPhone 15 (Lucas's Phone)",
-                model = "Apple iPhone 15",
-                online = true,
-                batteryLevel = 91,
-                latitude = 41.9255,
-                longitude = -87.6385,
-                accuracyMeters = 6,
-                locationSharingApproved = true,
-                cameraSessionApproved = false,
-                microphoneApproved = true,
-                pairingCode = "TV-3049",
-              ),
-            "tablet_emma" to
-              UserDevice(
-                deviceId = "tablet_emma",
-                userId = uid,
-                name = "Galaxy Tab A9 (Emma's Device)",
-                model = "Samsung SM-X110",
-                online = false,
-                batteryLevel = 45,
-                latitude = 41.8762,
-                longitude = -87.6281,
-                accuracyMeters = 10,
-                locationSharingApproved = false,
-                cameraSessionApproved = false,
-                microphoneApproved = false,
-                pairingCode = "TV-7192",
-              ),
-          )
-        for ((_, dev) in defaultDevices) {
-          registerOrUpdateDevice(dev).getOrThrow()
+      for (demoMsgId in legacyDemoMsgIds) {
+        profileRef.collection("messages").document(demoMsgId).delete()
+      }
+      // Also delete any member document whose name contains "Miller" or "Family Shield Bot"
+      val allMembers = profileRef.collection("members").get().await()
+      for (doc in allMembers.documents) {
+        val name = doc.getString("name").orEmpty()
+        if (name.contains("Miller", ignoreCase = true) || name.contains("Family Shield Bot", ignoreCase = true)) {
+          doc.reference.delete()
         }
       }
     }
+
+    val existingProfile = profileRef.get().await()
+    val existingName = existingProfile.getString("displayName").orEmpty()
+    if (!existingProfile.exists() || existingName.equals("David Miller", ignoreCase = true)) {
+      val initialProfile =
+        UserProfile(
+          userId = uid,
+          displayName = (displayName?.takeIf { it.isNotBlank() } ?: "FamLink User").take(80),
+          email = (email?.takeIf { it.isNotBlank() } ?: "user@famlink.app").take(150),
+          avatarUrl = (photoUrl?.takeIf { it.isNotBlank() } ?: "").take(600),
+          statusMessage = "FamLink Active • Family Protected",
+          ghostModeEnabled = false,
+          shareBatteryStatus = true,
+          darkModeMapStyling = false,
+          speedUnit = "MPH",
+          planTier = "FREE",
+        )
+      createOrUpdateUserProfile(initialProfile).getOrThrow()
+    }
+
+    // Register ONLY the real current phone as the primary active device if not present
+    val cleanDevId = currentDeviceId.ifBlank { "device_primary" }
+    val deviceRef = profileRef.collection("devices").document(cleanDevId)
+    val existingDev = deviceRef.get().await()
+    if (!existingDev.exists()) {
+      val realDevice =
+        UserDevice(
+          deviceId = cleanDevId,
+          userId = uid,
+          name = currentDeviceName.take(80).ifBlank { "This Phone" },
+          model = currentDeviceModel.take(80).ifBlank { "Android Device" },
+          online = true,
+          batteryLevel = 100,
+          latitude = 0.0,
+          longitude = 0.0,
+          accuracyMeters = 10,
+          locationSharingApproved = true,
+          cameraSessionApproved = true,
+          microphoneApproved = true,
+          pairingCode = "FL-" + (1000..9999).random(),
+        )
+      registerOrUpdateDevice(realDevice).getOrThrow()
+    } else {
+      deviceRef.update(
+        mapOf(
+          "online" to true,
+          "lastSeenAt" to FieldValue.serverTimestamp(),
+          "updatedAt" to FieldValue.serverTimestamp(),
+        ),
+      ).await()
+    }
+  }
+
+  suspend fun pairChildDevice(
+    childName: String,
+    role: String,
+    pairingCode: String,
+  ): Result<String> = runCatching {
+    val uid = requireUserId()
+    val cleanName = childName.trim().take(80).ifBlank { "Child Device" }
+    val memberId = "member_" + System.currentTimeMillis()
+    val memberRef = userDocRef(uid).collection("members").document(memberId)
+
+    val newMember =
+      FamilyMember(
+        id = memberId,
+        userId = uid,
+        name = cleanName,
+        role = role,
+        avatarUrl = "",
+        online = false,
+        liveSharing = false,
+        batteryLevel = 0,
+        speedMph = 0,
+        locationLabel = "Awaiting child phone link",
+        lastMessageSnippet = "Pairing code: $pairingCode",
+        lastActivityTimeLabel = "Not connected yet",
+        unreadCount = 0,
+        latitude = 0.0,
+        longitude = 0.0,
+        accuracyMeters = 10,
+        pairingCode = pairingCode,
+      )
+
+    memberRef.set(newMember.toWriteMap(uid)).await()
+
+    // Also create matching device entry for this child phone
+    val deviceId = "dev_" + memberId
+    val childDevice =
+      UserDevice(
+        id = deviceId,
+        deviceId = deviceId,
+        userId = uid,
+        name = "$cleanName's Phone",
+        model = "Child Phone",
+        online = false,
+        batteryLevel = 0,
+        latitude = 0.0,
+        longitude = 0.0,
+        accuracyMeters = 10,
+        locationSharingApproved = true,
+        cameraSessionApproved = true,
+        microphoneApproved = true,
+        pairingCode = pairingCode,
+      )
+    registerOrUpdateDevice(childDevice).getOrThrow()
+
+    memberId
+  }
+
+  suspend fun completeChildPairing(
+    pairingCode: String,
+    childDeviceId: String,
+    childDeviceName: String,
+    childDeviceModel: String,
+  ): Result<Boolean> = runCatching {
+    val uid = requireUserId()
+    val cleanCode = pairingCode.trim().uppercase()
+    val membersCol = userDocRef(uid).collection("members")
+    val querySnapshot = membersCol.whereEqualTo("pairingCode", cleanCode).get().await()
+
+    if (querySnapshot.isEmpty) {
+      return@runCatching false
+    }
+
+    val memberDoc = querySnapshot.documents.first()
+    memberDoc.reference.update(
+      mapOf(
+        "online" to true,
+        "locationLabel" to "Device Paired & Connected",
+        "lastMessageSnippet" to "Connected via pairing code $cleanCode",
+        "lastActivityTimeLabel" to "Just now",
+        "updatedAt" to FieldValue.serverTimestamp(),
+      ),
+    ).await()
+
+    // Update or register child device
+    val devRef = userDocRef(uid).collection("devices").document(childDeviceId)
+    devRef.set(
+      UserDevice(
+        id = childDeviceId,
+        deviceId = childDeviceId,
+        userId = uid,
+        name = childDeviceName.take(80),
+        model = childDeviceModel.take(80),
+        online = true,
+        batteryLevel = 100,
+        latitude = 0.0,
+        longitude = 0.0,
+        accuracyMeters = 10,
+        locationSharingApproved = true,
+        cameraSessionApproved = true,
+        microphoneApproved = true,
+        pairingCode = cleanCode,
+      ).toWriteMap(uid),
+    ).await()
+
+    true
+  }
+
+  suspend fun saveProfileImageToLocalStorage(
+    context: Context,
+    sourceUri: android.net.Uri,
+  ): Result<String> = runCatching {
+    val uid = requireUserId()
+    val avatarsDir = java.io.File(context.filesDir, "avatars").apply { mkdirs() }
+    val destFile = java.io.File(avatarsDir, "user_${uid.take(12)}_${System.currentTimeMillis()}.jpg")
+
+    context.contentResolver.openInputStream(sourceUri)?.use { input ->
+      val originalBitmap = android.graphics.BitmapFactory.decodeStream(input)
+      if (originalBitmap != null) {
+        val maxDim = 512
+        val width = originalBitmap.width
+        val height = originalBitmap.height
+        val scale =
+          if (width > maxDim || height > maxDim) {
+            maxDim.toFloat() / maxOf(width, height).toFloat()
+          } else {
+            1f
+          }
+        val targetW = (width * scale).toInt().coerceAtLeast(1)
+        val targetH = (height * scale).toInt().coerceAtLeast(1)
+        val scaled =
+          if (scale < 1f) {
+            android.graphics.Bitmap.createScaledBitmap(originalBitmap, targetW, targetH, true)
+          } else {
+            originalBitmap
+          }
+        destFile.outputStream().use { out ->
+          scaled.compress(android.graphics.Bitmap.CompressFormat.JPEG, 88, out)
+        }
+      } else {
+        context.contentResolver.openInputStream(sourceUri)?.use { rawIn ->
+          destFile.outputStream().use { out -> rawIn.copyTo(out) }
+        }
+      }
+    } ?: throw IllegalArgumentException("Unable to read selected image")
+
+    val localUriString = android.net.Uri.fromFile(destFile).toString().take(600)
+
+    // Also update FirebaseAuth currentUser profile photoUri
+    runCatching {
+      val profileUpdates =
+        com.google.firebase.auth.UserProfileChangeRequest.Builder()
+          .setPhotoUri(android.net.Uri.parse(localUriString))
+          .build()
+      auth.currentUser?.updateProfile(profileUpdates)?.await()
+    }
+
+    localUriString
+  }
 }

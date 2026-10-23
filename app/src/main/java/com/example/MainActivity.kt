@@ -336,6 +336,7 @@ private fun TrackViewAuthenticatedApp(user: FirebaseUser) {
                 onOpenPremiumModal = { showPremiumModal = true },
                 onTriggerCheckIn = { viewModel.triggerFamilyCheckInOrEmergency(false) },
                 onOpenDevicesTab = { currentTab = TrackViewTab.DEVICES },
+                onUploadProfilePhoto = { uri -> viewModel.uploadUserProfilePhoto(context, uri) },
               )
 
             TrackViewTab.MAP ->
@@ -416,6 +417,8 @@ private fun TrackViewAuthenticatedApp(user: FirebaseUser) {
                 },
                 onNotify = viewModel::postMessage,
                 onOpenDevicesTab = { currentTab = TrackViewTab.DEVICES },
+                onUploadProfilePhoto = { uri -> viewModel.uploadUserProfilePhoto(context, uri) },
+                onUpdateDisplayName = viewModel::updateUserDisplayName,
               )
           }
         }
@@ -451,6 +454,11 @@ private fun TrackViewAuthenticatedApp(user: FirebaseUser) {
         viewModel.pairNewFamilyDevice(name, role, code) { newDocId ->
           showPairingModal = false
           viewModel.selectMember(newDocId)
+        }
+      },
+      onCompleteChildPairing = { code ->
+        viewModel.completeChildDevicePairing(code) {
+          showPairingModal = false
         }
       },
     )

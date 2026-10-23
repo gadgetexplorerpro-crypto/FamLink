@@ -57,10 +57,10 @@ fun handleFirestoreError(exception: Exception, operationType: OperationType, pat
 data class UserProfile(
   @DocumentId @get:DocumentId val id: String = "",
   val userId: String = "",
-  val displayName: String = "David Miller",
-  val email: String = "david.miller@family.org",
-  val avatarUrl: String = Avatars.DAVID,
-  val statusMessage: String = "Available • Location shared with Family",
+  val displayName: String = "",
+  val email: String = "",
+  val avatarUrl: String = "",
+  val statusMessage: String = "FamLink Active • Family Protected",
   val ghostModeEnabled: Boolean = false,
   val shareBatteryStatus: Boolean = true,
   val darkModeMapStyling: Boolean = false,
@@ -93,27 +93,27 @@ data class FamilyMember(
   val name: String = "",
   val role: String = "CHILD", // SPOUSE, CHILD, SIBLING, GROUP, BOT
   val avatarUrl: String = "",
-  val online: Boolean = true,
+  val online: Boolean = false,
   val liveSharing: Boolean = false,
   val pinned: Boolean = false,
   val favorite: Boolean = false,
-  val batteryLevel: Int = 85,
+  val batteryLevel: Int = 0,
   val speedMph: Int = 0,
-  val locationLabel: String = "Home SafeZone",
-  val lastMessageSnippet: String = "Connected to Family Shield",
-  val lastActivityTimeLabel: String = "Just now",
+  val locationLabel: String = "No location report yet",
+  val lastMessageSnippet: String = "Device paired",
+  val lastActivityTimeLabel: String = "Pending sync",
   val unreadCount: Int = 0,
-  val screenTimeMinutesToday: Int = 110,
+  val screenTimeMinutesToday: Int = 0,
   val screenTimeLimitMinutes: Int = 180,
-  val latitude: Double = 41.9214,
-  val longitude: Double = -87.6513,
-  val accuracyMeters: Int = 5,
+  val latitude: Double = 0.0,
+  val longitude: Double = 0.0,
+  val accuracyMeters: Int = 10,
   val notifyOnSchoolDeparture: Boolean = true,
   val ghostMode: Boolean = false,
   val appRestrictionsEnabled: Boolean = true,
   val websiteSafetyEnabled: Boolean = true,
   val bedtimeSchedule: String = "9:30 PM - 6:30 AM",
-  val pairingCode: String = "TV-4021",
+  val pairingCode: String = "",
   @ServerTimestamp @get:ServerTimestamp val createdAt: Timestamp? = null,
   @ServerTimestamp @get:ServerTimestamp val updatedAt: Timestamp? = null,
 ) {
@@ -239,15 +239,15 @@ data class UserDevice(
   val userId: String = "",
   val name: String = "",
   val model: String = "",
-  val online: Boolean = true,
-  val batteryLevel: Int = 100,
-  val latitude: Double = 41.9214,
-  val longitude: Double = -87.6513,
-  val accuracyMeters: Int = 5,
-  val locationSharingApproved: Boolean = true,
-  val cameraSessionApproved: Boolean = true,
-  val microphoneApproved: Boolean = true,
-  val pairingCode: String = "TV-8841",
+  val online: Boolean = false,
+  val batteryLevel: Int = 0,
+  val latitude: Double = 0.0,
+  val longitude: Double = 0.0,
+  val accuracyMeters: Int = 10,
+  val locationSharingApproved: Boolean = false,
+  val cameraSessionApproved: Boolean = false,
+  val microphoneApproved: Boolean = false,
+  val pairingCode: String = "",
   @ServerTimestamp @get:ServerTimestamp val lastSeenAt: Timestamp? = null,
   @ServerTimestamp @get:ServerTimestamp val createdAt: Timestamp? = null,
   @ServerTimestamp @get:ServerTimestamp val updatedAt: Timestamp? = null,
@@ -313,18 +313,12 @@ data class DeviceSession(
 }
 
 object Avatars {
-  const val LOGO =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCKK4s12E2rIvPeCpON-H1dSTZhvMVU44aqKfFe9LGAje8GCiVe6-KPWHzX162q19oZ9dBRNFTfFdUpsREZZOcfGPlA5EDFmQCEBRG8sQWXC2BwZseOiySRZhhiw6VzAP4ElrEQWtZFRvh1SSD5OGnzUFpy75YHQHZeHuVqcn52nSrUs620mNrHXZgaIxJv-9XXq0Sxx9QptSk4oZvWbtULlTac2TtXlfNCa-B8Znd8aWSjf1lcXLza"
-  const val SARAH =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCbhtWSlqO5raSNRq6HMqgfhKzq6ebrqov9AR76_wrx0Ig_FUPWRk0jRdLtvZRCUMi1-9sGPZRqM6zS1wEJH0lsPejmU7VyL4pen5nc2mfAv1FGK-hskX3fteoSZY_ttsm9qIsdeDvKgjFjH-oaZ-M4fQ-sb3YOo35Op7ig1cg_aofpXu9W0l9e1C-px4ycDQPCdUtBGZu5xgtUzFWwUSOGhBNo9NWiEho0DPaUEekTKx1_ha4hJN3X"
-  const val LUCAS =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuC1O3o0PrFCszg04rVs_DByshMCvcIGNm3m0NiUPOaUQoiQ7mwzK_29fzXDRNYL2DM4s1u9x0Rxp7fagLUx-vLhhbiRoxhqNxC2gxNWEKxzaKWB0Y9UU_VLnt9EgqzcjgNB1tPqcYhon71Nywrt59N-VosMj_7uSbdtF3_1HRHmMTlyxgT0wJrHokblkZAtZFXBZPUMCr4fjlb7x-fheV5Jqlejh48HcofOIzC-MY4yrRCK1vBZO1HV"
-  const val EMMA =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuD9L048gkjgnhHpcYOTgvl6H64J9jmsC0hjVkfPDLYXEzKsrX102GFXGkGas0TJjIvDbdBkoWg-ctbAcSpfe0Ymdc8kg9Tn2tWlYlmxhgBLpOPQYoZ0Q88fh3_PlqWtbKlwp7QcbQC8A1Eavt62M9KsBH3mB-WRgypVPe71vtLiS_7Mf7jNCtuZ1bD1Vz6aiuuiCbQupgKWBxTilnrS4OsDrl0KbYfZrXXT7AF4QqkDqBwj-QVqZ5bp"
-  const val MARCUS =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuAl_TxrzpB5qijdssz8FsPdgsyI0TGKWS5xKj00kfWYBm5NiKrltUIL6Xybv9fUYs8h_sB4CggVg3_YCnJbQfMjfpzE7sSLjOoN7dhZDlSYsNoLk4qaFKNmB8pCSIH9qkEaCuJjhgahJB_U9Yww-a8v8ys-Fn5J0ROnM7bwo0GSo97-Pq_kqPjrVtsjtTYs5iA4YZ0G-YXCEt35wlYaLl-i5rupLQTXe2dX7YzekuKk-5CW9qIswBPP"
-  const val DAVID =
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCCNPfzLpRP8EXjG2X7KvlpySCK1s3uUhbN1U2SyeK3uZPwAokLTxqDXiwE2zyk5iL8XGG1fxmE1K-bIZxHq-aXQ6w1EsfpzFt3t1YjfH0-kLOzPQTGqcEI2CWw3vwXbgRR13QJ1ovsldb4KpXe3QS4U67Zv27T4s4YqbUK8IuA67V5mWmO9m4S6qmAgyDBWRNQXwAc78WLdFiJgPsejjHASNgtDHxSTvcKpqWpJ5gtysQXZJPcG5xY"
+  const val LOGO = ""
+  const val SARAH = ""
+  const val LUCAS = ""
+  const val EMMA = ""
+  const val MARCUS = ""
+  const val DAVID = ""
   const val MAP_BG =
     "https://lh3.googleusercontent.com/aida-public/AB6AXuAHj10GSswJRDUMIMW9caBD1MhyclegrqJEYlGfVNqvG7sEGZJsylt49dV8_sfjlKzG6yHcz_-6hovcLYfeFPIWd74jZpEkX3vOYXT9u8Q32etmPUhvnMl1E__fncPjnVGRpZq3OngsxSE2faElLzmpefT1Mwy0cue4UlCG5DfyKHkZ8zzGAza5CFU2CTPZzUDGbXiLBQtwpG7ktqPzGlVBWIOf9J59511rlj1V-mudQB8wH91cGOBm"
 }

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,8 +48,11 @@ import androidx.compose.material.icons.filled.Emergency
 import androidx.compose.material.icons.filled.LocationOff
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.NotificationsActive
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.QrCode2
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Schedule
@@ -377,6 +381,8 @@ fun SettingsScreen(
   onSignOut: () -> Unit,
   onNotify: (String) -> Unit,
   onOpenDevicesTab: (() -> Unit)? = null,
+  onUploadProfilePhoto: ((Uri) -> Unit)? = null,
+  onUpdateDisplayName: ((String) -> Unit)? = null,
 ) {
   val profile = (profileState as? UiState.Success)?.data ?: UserProfile()
   val safeZones = (safeZonesState as? UiState.Success)?.data.orEmpty()
@@ -385,8 +391,52 @@ fun SettingsScreen(
   var activeLegalDialogTab by remember { mutableStateOf<LegalTab?>(null) }
   var showQrDialog by rememberSaveable { mutableStateOf(false) }
   var showDeleteConfirmDialog by rememberSaveable { mutableStateOf(false) }
-  var tripRemainingMinutes by rememberSaveable { mutableIntStateOf(42) }
-  var tripActive by rememberSaveable { mutableStateOf(true) }
+  var showEditNameDialog by rememberSaveable { mutableStateOf(false) }
+  var showBgLocationRationale by rememberSaveable { mutableStateOf(false) }
+  var bgServiceEnabled by rememberSaveable {
+    mutableStateOf(com.example.service.FamLinkLocationService.isEnabled(context))
+  }
+  val familyInviteCode = remember(profile.userId) {
+    "FL-" + (profile.userId.takeLast(4).uppercase().ifBlank { "1000" })
+  }
+
+  val photoPickerLauncher =
+    rememberLauncherForActivityResult(
+      contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+      if (uri != null) {
+        onUploadProfilePhoto?.invoke(uri)
+      }
+    }
+
+  val backgroundLocationLauncher =
+    rememberLauncherForActivityResult(
+      contract = ActivityResultContracts.RequestPermission()
+    ) { _ ->
+      com.example.service.FamLinkLocationService.start(context)
+      bgServiceEnabled = true
+      onNotify("Persistent background location sharing enabled")
+    }
+
+  val foregroundLocationLauncher =
+    rememberLauncherForActivityResult(
+      contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { perms ->
+      val granted =
+        perms[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+          perms[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+      if (granted) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+          backgroundLocationLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        } else {
+          com.example.service.FamLinkLocationService.start(context)
+          bgServiceEnabled = true
+          onNotify("Persistent background location sharing enabled")
+        }
+      } else {
+        onNotify("Location permission is required for background location sharing")
+      }
+    }
 
   val notificationPermissionLauncher =
     rememberLauncherForActivityResult(
@@ -457,22 +507,67 @@ fun SettingsScreen(
               verticalAlignment = Alignment.CenterVertically,
               horizontalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-              AsyncImage(
-                model = profile.avatarUrl.ifBlank { Avatars.DAVID },
-                contentDescription = "Profile Avatar",
+              Box(
+                contentAlignment = Alignment.BottomEnd,
                 modifier =
-                  Modifier.size(64.dp)
-                    .clip(CircleShape)
-                    .border(2.5.dp, TrackViewGreen, CircleShape),
-                contentScale = ContentScale.Crop,
-              )
+                  Modifier.size(68.dp)
+                    .clickable {
+                      photoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                      )
+                    }
+                    .testTag("settings_profile_avatar_upload"),
+              ) {
+                if (profile.avatarUrl.isNotBlank()) {
+                  AsyncImage(
+                    model = profile.avatarUrl,
+                    contentDescription = "Profile Avatar",
+                    modifier =
+                      Modifier.size(64.dp)
+                        .clip(CircleShape)
+                        .border(2.5.dp, TrackViewGreen, CircleShape),
+                    contentScale = ContentScale.Crop,
+                  )
+                } else {
+                  Box(
+                    modifier =
+                      Modifier.size(64.dp)
+                        .clip(CircleShape)
+                        .background(TrackViewGreen.copy(alpha = 0.16f))
+                        .border(2.5.dp, TrackViewGreen, CircleShape),
+                    contentAlignment = Alignment.Center,
+                  ) {
+                    Icon(
+                      imageVector = Icons.Default.Person,
+                      contentDescription = "Upload Profile Avatar",
+                      tint = TrackViewTeal,
+                      modifier = Modifier.size(34.dp),
+                    )
+                  }
+                }
+                Box(
+                  modifier =
+                    Modifier.size(24.dp)
+                      .clip(CircleShape)
+                      .background(TrackViewGreen)
+                      .border(1.5.dp, MaterialTheme.colorScheme.surface, CircleShape),
+                  contentAlignment = Alignment.Center,
+                ) {
+                  Icon(
+                    imageVector = Icons.Default.PhotoCamera,
+                    contentDescription = "Upload Photo",
+                    tint = Color.White,
+                    modifier = Modifier.size(14.dp),
+                  )
+                }
+              }
               Column(modifier = Modifier.weight(1f)) {
                 Row(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                   Text(
-                    text = profile.displayName,
+                    text = profile.displayName.ifBlank { "FamLink User" },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                   )
@@ -512,9 +607,62 @@ fun SettingsScreen(
               }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
             Spacer(modifier = Modifier.height(12.dp))
+
+            // Upload Photo & Edit Name Row
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+              Button(
+                onClick = {
+                  photoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                  )
+                },
+                modifier = Modifier.weight(1f).testTag("profile_upload_photo_button"),
+                colors = ButtonDefaults.buttonColors(containerColor = TrackViewGreen),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+              ) {
+                Icon(
+                  imageVector = Icons.Default.PhotoCamera,
+                  contentDescription = null,
+                  modifier = Modifier.size(16.dp),
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                  text = "Upload Photo",
+                  style = MaterialTheme.typography.labelMedium,
+                  fontWeight = FontWeight.Bold,
+                )
+              }
+
+              OutlinedButton(
+                onClick = { showEditNameDialog = true },
+                modifier = Modifier.weight(1f).testTag("profile_edit_name_button"),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+              ) {
+                Icon(
+                  imageVector = Icons.Default.Edit,
+                  contentDescription = null,
+                  modifier = Modifier.size(16.dp),
+                  tint = TrackViewTeal,
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                  text = "Edit Name",
+                  style = MaterialTheme.typography.labelMedium,
+                  fontWeight = FontWeight.Bold,
+                  color = TrackViewTeal,
+                )
+              }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Profile Quick Action Buttons: Delete Account & Privacy Policy
             Row(
@@ -632,62 +780,53 @@ fun SettingsScreen(
         }
       }
 
-      // 3. Active Live Trip Session Card
-      if (tripActive && !profile.ghostModeEnabled) {
-        item {
-          Surface(
-            shape = RoundedCornerShape(18.dp),
-            color = TrackViewGreen.copy(alpha = 0.14f),
-            border =
-              androidx.compose.foundation.BorderStroke(
-                1.dp,
-                TrackViewGreen.copy(alpha = 0.4f),
-              ),
-            modifier = Modifier.fillMaxWidth(),
-          ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-              Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-              ) {
-                Column {
-                  Text(
-                    text = "Active Live Trip Session",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                  )
-                  Text(
-                    text = "Sharing with Miller Family Hub • ${tripRemainingMinutes}m remaining",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                  )
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                  OutlinedButton(
-                    onClick = {
-                      tripRemainingMinutes += 30
-                      onNotify("Extended live trip session by 30 minutes")
-                    },
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                  ) {
-                    Text("+30m", style = MaterialTheme.typography.labelMedium)
-                  }
-                  Button(
-                    onClick = {
-                      tripActive = false
-                      onNotify("Live trip session ended")
-                    },
-                    colors =
-                      ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error
-                      ),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
-                  ) {
-                    Text("End Trip", style = MaterialTheme.typography.labelMedium)
-                  }
-                }
+      // 3. Persistent Background Location Sharing Card (Foreground Service)
+      item {
+        Surface(
+          shape = RoundedCornerShape(18.dp),
+          color = TrackViewGreen.copy(alpha = 0.14f),
+          border =
+            androidx.compose.foundation.BorderStroke(
+              1.dp,
+              TrackViewGreen.copy(alpha = 0.4f),
+            ),
+          modifier = Modifier.fillMaxWidth().testTag("background_location_service_card"),
+        ) {
+          Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+              modifier = Modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.SpaceBetween,
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              Column(modifier = Modifier.weight(1f)) {
+                Text(
+                  text = "Persistent Background Location Sharing",
+                  style = MaterialTheme.typography.titleSmall,
+                  fontWeight = FontWeight.Bold,
+                )
+                Text(
+                  text =
+                    if (bgServiceEnabled && !profile.ghostModeEnabled)
+                      "Active • Foreground notification running for continuous family GPS updates"
+                    else
+                      "Keep sharing real-time GPS with paired family members when FamLink is closed",
+                  style = MaterialTheme.typography.bodySmall,
+                  color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
               }
+              Switch(
+                checked = bgServiceEnabled && !profile.ghostModeEnabled,
+                onCheckedChange = { enable ->
+                  if (enable) {
+                    showBgLocationRationale = true
+                  } else {
+                    com.example.service.FamLinkLocationService.stop(context)
+                    bgServiceEnabled = false
+                    onNotify("Background location sharing stopped")
+                  }
+                },
+                modifier = Modifier.testTag("background_location_service_switch"),
+              )
             }
           }
         }
@@ -936,7 +1075,7 @@ fun SettingsScreen(
           Spacer(modifier = Modifier.height(4.dp))
 
           Text(
-            text = "TrackView v4.2.0 • End-to-End Encrypted Family Safety Mesh",
+            text = "FamLink v3.0 • End-to-End Encrypted Family Safety Mesh",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -955,6 +1094,70 @@ fun SettingsScreen(
         }
       }
     }
+  }
+
+  // Edit Display Name Dialog
+  if (showEditNameDialog) {
+    var nameInput by rememberSaveable(profile.displayName) { mutableStateOf(profile.displayName) }
+    AlertDialog(
+      onDismissRequest = { showEditNameDialog = false },
+      title = { Text("Update Display Name") },
+      text = {
+        OutlinedTextField(
+          value = nameInput,
+          onValueChange = { nameInput = it },
+          label = { Text("Your Name") },
+          singleLine = true,
+          modifier = Modifier.fillMaxWidth(),
+        )
+      },
+      confirmButton = {
+        Button(
+          onClick = {
+            onUpdateDisplayName?.invoke(nameInput)
+            showEditNameDialog = false
+          },
+          colors = ButtonDefaults.buttonColors(containerColor = TrackViewGreen),
+        ) {
+          Text("Save")
+        }
+      },
+      dismissButton = {
+        TextButton(onClick = { showEditNameDialog = false }) { Text("Cancel") }
+      },
+    )
+  }
+
+  // Background Location Access Explanation Dialog (Required before requesting ACCESS_BACKGROUND_LOCATION)
+  if (showBgLocationRationale) {
+    AlertDialog(
+      onDismissRequest = { showBgLocationRationale = false },
+      title = { Text("Background Location Access") },
+      text = {
+        Text(
+          "FamLink collects location data in the background using a visible Android Foreground Service notification so your authorized family group can see your live location and SafeZone arrivals even when the app is closed or not in use.\n\nYou can pause or stop background sharing at any time from the persistent notification or Settings."
+        )
+      },
+      confirmButton = {
+        Button(
+          onClick = {
+            showBgLocationRationale = false
+            foregroundLocationLauncher.launch(
+              arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+              )
+            )
+          },
+          colors = ButtonDefaults.buttonColors(containerColor = TrackViewGreen),
+        ) {
+          Text("Approve & Enable")
+        }
+      },
+      dismissButton = {
+        TextButton(onClick = { showBgLocationRationale = false }) { Text("Not Now") }
+      },
+    )
   }
 
   // QR Code Dialog
@@ -984,14 +1187,14 @@ fun SettingsScreen(
             )
           }
           Text(
-            text = "Invite Code: TV-MILLER-8841",
+            text = "Invite Code: $familyInviteCode",
             style = MaterialTheme.typography.titleMedium,
             fontFamily = FontFamily.Monospace,
             fontWeight = FontWeight.Bold,
           )
           Text(
             text =
-              "Scan this code from your child or spouse's TrackView app to establish mutual encrypted location sharing.",
+              "Scan this code or enter the invite key from your child or spouse's FamLink app to establish mutual encrypted location sharing.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -1186,10 +1389,13 @@ private fun SettingsSwitchItem(
 fun DevicePairingDialog(
   onDismiss: () -> Unit,
   onConfirmPair: (name: String, role: String, pairingCode: String) -> Unit,
+  onCompleteChildPairing: ((pairingCode: String) -> Unit)? = null,
 ) {
+  var isChildJoiningParent by rememberSaveable { mutableStateOf(false) }
   var selectedRole by rememberSaveable { mutableStateOf("CHILD") }
   var memberName by rememberSaveable { mutableStateOf("") }
-  var pairingCode by rememberSaveable { mutableStateOf("TV-9042") }
+  val generatedCode = remember { "FL-" + (1000..9999).random() }
+  var pairingCode by rememberSaveable { mutableStateOf(generatedCode) }
   var mutualConsentChecked by rememberSaveable { mutableStateOf(true) }
   var qrMode by rememberSaveable { mutableStateOf(false) }
 
@@ -1210,50 +1416,90 @@ fun DevicePairingDialog(
     },
     text = {
       Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(
-          text = "1. Select Device Role",
-          style = MaterialTheme.typography.labelMedium,
-          fontWeight = FontWeight.Bold,
-          color = TrackViewTeal,
-        )
+        // Mode selector: Parent generating code vs Child entering code
         Row(
           modifier = Modifier.fillMaxWidth(),
           horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-          listOf("CHILD" to "Child Device", "SPOUSE" to "Parent / Spouse").forEach { (role, label) ->
-            val selected = selectedRole == role
-            Surface(
-              shape = RoundedCornerShape(12.dp),
-              color =
-                if (selected) TrackViewGreen.copy(alpha = 0.18f)
-                else MaterialTheme.colorScheme.surfaceVariant,
-              border =
-                androidx.compose.foundation.BorderStroke(
-                  width = if (selected) 2.dp else 1.dp,
-                  color = if (selected) TrackViewGreen else Color.Transparent,
-                ),
-              modifier =
-                Modifier.weight(1f)
-                  .clickable { selectedRole = role }
-                  .testTag("pair_role_${role.lowercase()}"),
-            ) {
-              Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp),
-              )
-            }
+          OutlinedButton(
+            onClick = {
+              isChildJoiningParent = false
+              pairingCode = generatedCode
+            },
+            modifier = Modifier.weight(1f),
+            colors =
+              ButtonDefaults.outlinedButtonColors(
+                containerColor =
+                  if (!isChildJoiningParent) TrackViewGreen.copy(alpha = 0.16f)
+                  else Color.Transparent
+              ),
+          ) {
+            Text("Parent (Create Code)", style = MaterialTheme.typography.labelSmall)
+          }
+          OutlinedButton(
+            onClick = {
+              isChildJoiningParent = true
+              pairingCode = ""
+            },
+            modifier = Modifier.weight(1f),
+            colors =
+              ButtonDefaults.outlinedButtonColors(
+                containerColor =
+                  if (isChildJoiningParent) TrackViewGreen.copy(alpha = 0.16f)
+                  else Color.Transparent
+              ),
+          ) {
+            Text("Child (Enter Code)", style = MaterialTheme.typography.labelSmall)
           }
         }
 
-        OutlinedTextField(
-          value = memberName,
-          onValueChange = { memberName = it },
-          label = { Text("Family Member Name (e.g., Noah Miller)") },
-          singleLine = true,
-          modifier = Modifier.fillMaxWidth().testTag("pair_member_name_input"),
-        )
+        if (!isChildJoiningParent) {
+          Text(
+            text = "1. Select Device Role",
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            color = TrackViewTeal,
+          )
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+          ) {
+            listOf("CHILD" to "Child Device", "SPOUSE" to "Parent / Spouse").forEach { (role, label) ->
+              val selected = selectedRole == role
+              Surface(
+                shape = RoundedCornerShape(12.dp),
+                color =
+                  if (selected) TrackViewGreen.copy(alpha = 0.18f)
+                  else MaterialTheme.colorScheme.surfaceVariant,
+                border =
+                  androidx.compose.foundation.BorderStroke(
+                    width = if (selected) 2.dp else 1.dp,
+                    color = if (selected) TrackViewGreen else Color.Transparent,
+                  ),
+                modifier =
+                  Modifier.weight(1f)
+                    .clickable { selectedRole = role }
+                    .testTag("pair_role_${role.lowercase()}"),
+              ) {
+                Text(
+                  text = label,
+                  style = MaterialTheme.typography.labelMedium,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp),
+                )
+              }
+            }
+          }
+
+          OutlinedTextField(
+            value = memberName,
+            onValueChange = { memberName = it },
+            label = { Text("Family Member Name") },
+            placeholder = { Text("Enter child or family member name") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth().testTag("pair_member_name_input"),
+          )
+        }
 
         Row(
           modifier = Modifier.fillMaxWidth(),
@@ -1261,23 +1507,25 @@ fun DevicePairingDialog(
           verticalAlignment = Alignment.CenterVertically,
         ) {
           Text(
-            text = "2. Pairing Method",
+            text = if (isChildJoiningParent) "Enter Parent Pairing Code" else "2. Expiring Pairing Code (15m)",
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
             color = TrackViewTeal,
           )
-          TextButton(onClick = { qrMode = !qrMode }) {
-            Icon(
-              imageVector = if (qrMode) Icons.Default.Lock else Icons.Default.QrCodeScanner,
-              contentDescription = null,
-              modifier = Modifier.size(16.dp),
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(if (qrMode) "Use Pairing Code" else "Scan QR Code")
+          if (!isChildJoiningParent) {
+            TextButton(onClick = { qrMode = !qrMode }) {
+              Icon(
+                imageVector = if (qrMode) Icons.Default.Lock else Icons.Default.QrCodeScanner,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp),
+              )
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(if (qrMode) "Use Pairing Code" else "Show QR Code")
+            }
           }
         }
 
-        if (qrMode) {
+        if (qrMode && !isChildJoiningParent) {
           Box(
             modifier =
               Modifier.fillMaxWidth()
@@ -1305,7 +1553,7 @@ fun DevicePairingDialog(
           OutlinedTextField(
             value = pairingCode,
             onValueChange = { pairingCode = it },
-            label = { Text("6-Character Pairing Code") },
+            label = { Text("Pairing Code (e.g., FL-1234)") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth().testTag("pair_code_input"),
           )
@@ -1321,7 +1569,7 @@ fun DevicePairingDialog(
           )
           Text(
             text =
-              "Both devices have accepted the visible TrackView location & parental control consent notice.",
+              "Both devices have accepted the visible FamLink location & parental control consent notice.",
             style = MaterialTheme.typography.labelSmall,
           )
         }
@@ -1330,17 +1578,24 @@ fun DevicePairingDialog(
     confirmButton = {
       Button(
         onClick = {
-          onConfirmPair(
-            memberName.ifBlank { "Noah Miller" },
-            selectedRole,
-            pairingCode,
-          )
+          if (isChildJoiningParent && onCompleteChildPairing != null) {
+            onCompleteChildPairing(pairingCode.trim())
+          } else {
+            onConfirmPair(
+              memberName.trim().ifBlank { "Family Device" },
+              selectedRole,
+              pairingCode.trim().ifBlank { generatedCode },
+            )
+          }
         },
-        enabled = mutualConsentChecked,
+        enabled =
+          mutualConsentChecked &&
+            pairingCode.isNotBlank() &&
+            (isChildJoiningParent || memberName.isNotBlank()),
         colors = ButtonDefaults.buttonColors(containerColor = TrackViewGreen),
         modifier = Modifier.testTag("pair_confirm_button"),
       ) {
-        Text("Complete Pairing")
+        Text(if (isChildJoiningParent) "Approve & Link Child Phone" else "Generate & Register")
       }
     },
     dismissButton = {

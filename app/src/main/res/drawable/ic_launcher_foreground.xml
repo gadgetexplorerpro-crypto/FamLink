@@ -4,16 +4,59 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Outer family safety shield -->
+
+    <!-- Central White Shield Outline (EvenOdd path for crisp hollow shield) -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M54,24L30,34v18c0,16.5 10.2,31.8 24,36 13.8,-4.2 24,-19.5 24,-36V34L54,24z" />
-    <!-- Inner emerald radar pin cutout -->
+        android:fillType="evenOdd"
+        android:pathData="M54,25 L34,32.5 L34,50 C34,65.5 42.6,76.8 54,82 C65.4,76.8 74,65.5 74,50 L74,32.5 Z M54,29.5 L69.8,35.4 L69.8,50 C69.8,63 62.6,72.6 54,77.3 C45.4,72.6 38.2,63 38.2,50 L38.2,35.4 Z" />
+
+    <!-- Central Location Pin with circular cutout inside the shield -->
     <path
-        android:fillColor="#006B53"
-        android:pathData="M54,36c-7.7,0 -14,6.3 -14,14 0,9.5 14,22 14,22s14,-12.5 14,-22c0,-7.7 -6.3,-14 -14,-14z" />
-    <!-- Center radar core -->
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M54,39 C48.8,39 44.6,43.2 44.6,48.4 C44.6,55.2 54,64.8 54,64.8 C54,64.8 63.4,55.2 63.4,48.4 C63.4,43.2 59.2,39 54,39 Z M54,44.4 C56.2,44.4 58,46.2 58,48.4 C58,50.6 56.2,52.4 54,52.4 C51.8,52.4 50,50.6 50,48.4 C50,46.2 51.8,44.4 54,44.4 Z" />
+
+    <!-- Left Adult Father Figure -->
+    <!-- Head -->
     <path
-        android:fillColor="#79F9D0"
-        android:pathData="M54,44c-3.3,0 -6,2.7 -6,6s2.7,6 6,6 6,-2.7 6,-6 -2.7,-6 -6,-6z" />
+        android:fillColor="#FFFFFF"
+        android:pathData="M24.5,38.5 m-3.6,0 a3.6,3.6 0 1,1 7.2,0 a3.6,3.6 0 1,1 -7.2,0" />
+    <!-- Torso, Arms & Legs -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M21,43.5 C19,43.5 17.5,45 17.5,47 L17.5,54 C17.5,54.8 18.2,55.5 19,55.5 C19.8,55.5 20.5,54.8 20.5,54 L20.5,47.5 L21.3,47.5 L21.3,63.5 C21.3,64.5 22.1,65.3 23.1,65.3 C24,65.3 24.7,64.5 24.7,63.5 L24.7,55.5 L25.3,55.5 L25.3,63.5 C25.3,64.5 26,65.3 26.9,65.3 C27.9,65.3 28.7,64.5 28.7,63.5 L28.7,47.5 L29.5,47.5 L29.5,54 C29.5,54.8 30.2,55.5 31,55.5 C31.8,55.5 32.5,54.8 32.5,54 L32.5,47 C32.5,45 31,43.5 29,43.5 Z" />
+
+    <!-- Left Child Boy Figure -->
+    <!-- Head -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M32.5,63.2 m-2.8,0 a2.8,2.8 0 1,1 5.6,0 a2.8,2.8 0 1,1 -5.6,0" />
+    <!-- Torso, Arms & Legs -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,67 C28.5,67 27.4,68.1 27.4,69.6 L27.4,74.2 C27.4,74.8 27.9,75.3 28.5,75.3 C29.1,75.3 29.6,74.8 29.6,74.2 L29.6,70 L30.2,70 L30.2,80.5 C30.2,81.2 30.8,81.8 31.5,81.8 C32.1,81.8 32.6,81.2 32.6,80.5 L32.6,75.2 L33.2,75.2 L33.2,80.5 C33.2,81.2 33.7,81.8 34.3,81.8 C35,81.8 35.6,81.2 35.6,80.5 L35.6,70 L36.2,70 L36.2,74.2 C36.2,74.8 36.7,75.3 37.3,75.3 C37.9,75.3 38.4,74.8 38.4,74.2 L38.4,69.6 C38.4,68.1 37.3,67 35.8,67 Z" />
+
+    <!-- Right Adult Mother Figure -->
+    <!-- Head & Hair silhouette -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M83.5,38.5 m-3.6,0 a3.6,3.6 0 1,1 7.2,0 a3.6,3.6 0 1,1 -7.2,0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M79.2,39.5 C79.2,36 81.2,34.5 83.5,34.5 C85.8,34.5 87.8,36 87.8,39.5 L88.6,41.5 L86.8,41.8 L86.4,39.5 L80.6,39.5 L80.2,41.8 L78.4,41.5 Z" />
+    <!-- Torso, Arms & Legs -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M80,43.5 C78,43.5 76.5,45 76.5,47 L76.5,54 C76.5,54.8 77.2,55.5 78,55.5 C78.8,55.5 79.5,54.8 79.5,54 L79.5,47.5 L80.3,47.5 L80.3,63.5 C80.3,64.5 81.1,65.3 82.1,65.3 C83,65.3 83.7,64.5 83.7,63.5 L83.7,55.5 L84.3,55.5 L84.3,63.5 C84.3,64.5 85,65.3 85.9,65.3 C86.9,65.3 87.7,64.5 87.7,63.5 L87.7,47.5 L88.5,47.5 L88.5,54 C88.5,54.8 89.2,55.5 90,55.5 C90.8,55.5 91.5,54.8 91.5,54 L91.5,47 C91.5,45 90,43.5 88,43.5 Z" />
+
+    <!-- Right Child Girl Figure (with dress/skirt) -->
+    <!-- Head -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M75.5,63.2 m-2.8,0 a2.8,2.8 0 1,1 5.6,0 a2.8,2.8 0 1,1 -5.6,0" />
+    <!-- Torso, Skirt, Arms & Legs -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M73,67 C71.5,67 70.4,68.1 70.4,69.6 L70.4,73.8 C70.4,74.4 70.9,74.9 71.5,74.9 C72.1,74.9 72.6,74.4 72.6,73.8 L72.6,70 L73.2,70 L71.8,76.4 L73.4,76.4 L73.4,80.5 C73.4,81.2 73.9,81.8 74.6,81.8 C75.2,81.8 75.7,81.2 75.7,80.5 L75.7,76.4 L76.3,76.4 L76.3,80.5 C76.3,81.2 76.8,81.8 77.4,81.8 C78.1,81.8 78.6,81.2 78.6,80.5 L78.6,76.4 L80.2,76.4 L78.8,70 L79.4,70 L79.4,73.8 C79.4,74.4 79.9,74.9 80.5,74.9 C81.1,74.9 81.6,74.4 81.6,73.8 L81.6,69.6 C81.6,68.1 80.5,67 79,67 Z" />
 </vector>

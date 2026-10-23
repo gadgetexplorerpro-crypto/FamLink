@@ -8,14 +8,19 @@
     <path android:pathData="M0,0h108v108h-108z">
         <aapt:attr name="android:fillColor">
             <gradient
-                android:startX="0"
+                android:startX="54"
                 android:startY="0"
-                android:endX="108"
+                android:endX="54"
                 android:endY="108"
                 android:type="linear">
-                <item android:offset="0.0" android:color="#006B53" />
-                <item android:offset="1.0" android:color="#00A884" />
+                <item android:offset="0.0" android:color="#8AC0EE" />
+                <item android:offset="0.5" android:color="#5B9AE0" />
+                <item android:offset="1.0" android:color="#3573C6" />
             </gradient>
         </aapt:attr>
     </path>
+    <!-- Subtle glossy arc matching the FamLink logo -->
+    <path
+        android:fillColor="#18FFFFFF"
+        android:pathData="M0,0 L108,0 L108,58 C78,42 38,38 0,52 Z" />
 </vector>

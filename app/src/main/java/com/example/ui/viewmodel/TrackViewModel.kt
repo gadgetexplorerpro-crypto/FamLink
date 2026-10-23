@@ -36,8 +36,8 @@ sealed interface UiState<out T> {
 class TrackViewModel(
   private val repository: TrackViewRepository,
   private val currentUserId: String,
-  userDisplayName: String? = null,
-  userEmail: String? = null,
+  private val userDisplayName: String? = null,
+  private val userEmail: String? = null,
 ) : ViewModel() {
 
   private val _selectedMemberId = MutableStateFlow<String?>(null)
@@ -55,16 +55,16 @@ class TrackViewModel(
   private val _liveBannerPaused = MutableStateFlow(false)
   val liveBannerPaused: StateFlow<Boolean> = _liveBannerPaused.asStateFlow()
 
-  private val _deviceGpsLatitude = MutableStateFlow(41.9214)
+  private val _deviceGpsLatitude = MutableStateFlow(0.0)
   val deviceGpsLatitude: StateFlow<Double> = _deviceGpsLatitude.asStateFlow()
 
-  private val _deviceGpsLongitude = MutableStateFlow(-87.6513)
+  private val _deviceGpsLongitude = MutableStateFlow(0.0)
   val deviceGpsLongitude: StateFlow<Double> = _deviceGpsLongitude.asStateFlow()
 
-  private val _deviceGpsAccuracy = MutableStateFlow(4)
+  private val _deviceGpsAccuracy = MutableStateFlow(0)
   val deviceGpsAccuracy: StateFlow<Int> = _deviceGpsAccuracy.asStateFlow()
 
-  private val _isGpsConsentVerified = MutableStateFlow(true)
+  private val _isGpsConsentVerified = MutableStateFlow(false)
   val isGpsConsentVerified: StateFlow<Boolean> = _isGpsConsentVerified.asStateFlow()
 
   private val _snackbarMessage = MutableStateFlow<String?>(null)
@@ -73,8 +73,15 @@ class TrackViewModel(
   private val _exportedJsonData = MutableStateFlow<String?>(null)
   val exportedJsonData: StateFlow<String?> = _exportedJsonData.asStateFlow()
 
-  val currentDeviceId: String = "pixel_8_pro"
-  val currentDeviceName: String = "Pixel 8 Pro (This Phone)"
+  val currentDeviceId: String =
+    "dev_" +
+      android.os.Build.MODEL.lowercase().replace("[^a-z0-9]".toRegex(), "_").take(16) +
+      "_" +
+      currentUserId.take(6).lowercase()
+  val currentDeviceName: String =
+    "${android.os.Build.MANUFACTURER.replaceFirstChar { it.uppercase() }} ${android.os.Build.MODEL} (This Phone)"
+  val currentDeviceModel: String =
+    "${android.os.Build.MANUFACTURER.replaceFirstChar { it.uppercase() }} ${android.os.Build.MODEL}"
 
   private val _activeSessionId = MutableStateFlow<String?>(null)
   val activeSessionId: StateFlow<String?> = _activeSessionId.asStateFlow()
@@ -84,9 +91,17 @@ class TrackViewModel(
 
   init {
     viewModelScope.launch {
-      repository.ensureInitialDataSeeded(userDisplayName, userEmail).onFailure { e ->
-        Log.w(TAG, "Initial seed check warning: ${e.message}", e)
-      }
+      repository
+        .ensureRealUserInitialized(
+          displayName = userDisplayName,
+          email = userEmail,
+          currentDeviceId = currentDeviceId,
+          currentDeviceName = currentDeviceName,
+          currentDeviceModel = currentDeviceModel,
+        )
+        .onFailure { e ->
+          Log.w(TAG, "Initial user initialization warning: ${e.message}", e)
+        }
       repository.observeIncomingSessions(currentUserId, currentDeviceId).collect { sessions ->
         _incomingConsentSession.value = sessions.firstOrNull()
       }
@@ -244,6 +259,9 @@ class TrackViewModel(
     _deviceGpsLongitude.value = lng
     _deviceGpsAccuracy.value = accuracyMeters.coerceIn(1, 5000)
     _isGpsConsentVerified.value = true
+    viewModelScope.launch {
+      repository.updateDeviceLocation(currentDeviceId, lat, lng, accuracyMeters.coerceIn(1, 5000))
+    }
     _snackbarMessage.value =
       "GPS updated (${String.format("%.4f", lat)}, ${String.format("%.4f", lng)} • ±${accuracyMeters}m)"
   }
@@ -432,6 +450,65 @@ class TrackViewModel(
     }
   }
 
+  fun uploadUserProfilePhoto(context: android.content.Context, sourceUri: android.net.Uri) {
+    val currentProfile =
+      (profileState.value as? UiState.Success)?.data
+        ?: UserProfile(
+          userId = currentUserId,
+          displayName = userDisplayName?.takeIf { it.isNotBlank() } ?: "FamLink User",
+          email = userEmail?.takeIf { it.isNotBlank() } ?: "user@famlink.app",
+        )
+    viewModelScope.launch {
+      repository
+        .saveProfileImageToLocalStorage(context, sourceUri)
+        .onSuccess { savedUriString ->
+          repository
+            .createOrUpdateUserProfile(
+              currentProfile.copy(
+                avatarUrl = savedUriString,
+                displayName = currentProfile.displayName.ifBlank { "FamLink User" },
+                email = currentProfile.email.ifBlank { "user@famlink.app" },
+              )
+            )
+            .onSuccess {
+              _snackbarMessage.value = "Profile photo uploaded and saved!"
+            }
+            .onFailure { e ->
+              _snackbarMessage.value = e.localizedMessage ?: "Failed to update profile photo"
+            }
+        }
+        .onFailure { e ->
+          _snackbarMessage.value = e.localizedMessage ?: "Could not load selected image"
+        }
+    }
+  }
+
+  fun updateUserDisplayName(newName: String) {
+    val cleanName = newName.trim().take(80)
+    if (cleanName.isBlank()) {
+      _snackbarMessage.value = "Display name cannot be empty"
+      return
+    }
+    val currentProfile =
+      (profileState.value as? UiState.Success)?.data
+        ?: UserProfile(
+          userId = currentUserId,
+          email = userEmail?.takeIf { it.isNotBlank() } ?: "user@famlink.app",
+        )
+    viewModelScope.launch {
+      repository
+        .createOrUpdateUserProfile(
+          currentProfile.copy(
+            displayName = cleanName,
+            email = currentProfile.email.ifBlank { "user@famlink.app" },
+          )
+        )
+        .onSuccess {
+          _snackbarMessage.value = "Profile name updated to $cleanName"
+        }
+    }
+  }
+
   fun updateMemberParentalControls(
     member: FamilyMember,
     screenTimeLimitMinutes: Int = member.screenTimeLimitMinutes,
@@ -472,64 +549,57 @@ class TrackViewModel(
     }
     val validRole =
       if (role in listOf("SPOUSE", "CHILD", "SIBLING", "GROUP", "BOT")) role else "CHILD"
-    val cleanCode = pairingCode.trim().uppercase().take(20).ifBlank { "TV-9042" }
-    val avatar =
-      when (validRole) {
-        "SPOUSE" -> Avatars.SARAH
-        "CHILD" -> Avatars.LUCAS
-        "SIBLING" -> Avatars.MARCUS
-        else -> Avatars.EMMA
-      }
-
-    val newMember =
-      FamilyMember(
-        userId = currentUserId,
-        name = cleanName,
-        role = validRole,
-        avatarUrl = avatar,
-        online = true,
-        liveSharing = true,
-        pinned = false,
-        favorite = true,
-        batteryLevel = 96,
-        speedMph = 0,
-        locationLabel = "Paired near Home SafeZone",
-        lastMessageSnippet = "Device paired with code $cleanCode • Consent verified",
-        lastActivityTimeLabel = "Just now",
-        unreadCount = 1,
-        screenTimeMinutesToday = 20,
-        screenTimeLimitMinutes = 180,
-        latitude = _deviceGpsLatitude.value + 0.003,
-        longitude = _deviceGpsLongitude.value - 0.002,
-        accuracyMeters = 4,
-        notifyOnSchoolDeparture = true,
-        ghostMode = false,
-        appRestrictionsEnabled = validRole == "CHILD",
-        websiteSafetyEnabled = true,
-        bedtimeSchedule = "9:30 PM - 6:30 AM",
-        pairingCode = cleanCode,
-      )
+    val cleanCode =
+      pairingCode.trim().uppercase().take(20).ifBlank { "FL-" + (1000..9999).random() }
 
     viewModelScope.launch {
       repository
-        .addFamilyMember(newMember)
+        .pairChildDevice(cleanName, validRole, cleanCode)
         .onSuccess { docId ->
           repository.addSafetyAlert(
             SafetyAlert(
               userId = currentUserId,
               memberName = cleanName,
               alertType = "ARRIVAL",
-              title = "New Family Device Paired ($cleanCode)",
-              description = "$cleanName ($validRole) joined your encrypted Family Shield mesh.",
+              title = "Pairing Invited ($cleanCode)",
+              description = "Created pairing invitation for $cleanName ($validRole). Enter code $cleanCode on their phone to complete setup.",
               timeLabel = "Just now",
               read = false,
             )
           )
-          _snackbarMessage.value = "$cleanName paired successfully!"
+          _snackbarMessage.value = "Pairing code $cleanCode ready for $cleanName!"
           onPaired(docId)
         }
         .onFailure { e ->
-          _snackbarMessage.value = e.localizedMessage ?: "Failed to pair device"
+          _snackbarMessage.value = e.localizedMessage ?: "Failed to create pairing invitation"
+        }
+    }
+  }
+
+  fun completeChildDevicePairing(pairingCode: String, onSuccess: () -> Unit = {}) {
+    val cleanCode = pairingCode.trim().uppercase()
+    if (cleanCode.isBlank()) {
+      _snackbarMessage.value = "Please enter a valid pairing code"
+      return
+    }
+    viewModelScope.launch {
+      repository
+        .completeChildPairing(
+          pairingCode = cleanCode,
+          childDeviceId = currentDeviceId,
+          childDeviceName = currentDeviceName,
+          childDeviceModel = currentDeviceModel,
+        )
+        .onSuccess { matched ->
+          if (matched) {
+            _snackbarMessage.value = "This phone is now paired and linked with code $cleanCode!"
+            onSuccess()
+          } else {
+            _snackbarMessage.value = "No pending invitation found for code $cleanCode"
+          }
+        }
+        .onFailure { e ->
+          _snackbarMessage.value = e.localizedMessage ?: "Failed to complete pairing"
         }
     }
   }
@@ -787,9 +857,9 @@ class TrackViewModel(
   }
 
   fun pairNewPhoneDevice(name: String, model: String, pairingCode: String, onComplete: () -> Unit = {}) {
-    val cleanName = name.trim().take(80).ifBlank { "Remote Phone" }
-    val cleanCode = pairingCode.trim().uppercase().take(20).ifBlank { "TV-5510" }
-    val newId = "phone_" + cleanCode.lowercase().replace("-", "_")
+    val cleanName = name.trim().take(80).ifBlank { "Child / Secondary Phone" }
+    val cleanCode = pairingCode.trim().uppercase().take(20).ifBlank { "FL-" + (1000..9999).random() }
+    val newId = "phone_" + cleanCode.lowercase().replace("[^a-z0-9]".toRegex(), "_")
 
     val newDevice =
       UserDevice(
@@ -797,11 +867,11 @@ class TrackViewModel(
         userId = currentUserId,
         name = cleanName,
         model = model.ifBlank { "Android Smartphone" },
-        online = true,
-        batteryLevel = 90,
-        latitude = _deviceGpsLatitude.value + 0.002,
-        longitude = _deviceGpsLongitude.value - 0.003,
-        accuracyMeters = 5,
+        online = false,
+        batteryLevel = 0,
+        latitude = 0.0,
+        longitude = 0.0,
+        accuracyMeters = 10,
         locationSharingApproved = true,
         cameraSessionApproved = true,
         microphoneApproved = true,
@@ -815,16 +885,16 @@ class TrackViewModel(
             userId = currentUserId,
             memberName = cleanName,
             alertType = "ARRIVAL",
-            title = "New Phone Connected ($cleanCode)",
-            description = "$cleanName paired to your account. Remote location & media sessions enabled.",
+            title = "New Phone Registered ($cleanCode)",
+            description = "$cleanName registered under your family group. Complete pairing on the device using code $cleanCode.",
             timeLabel = "Just now",
             read = false,
           )
         )
-        _snackbarMessage.value = "$cleanName connected successfully!"
+        _snackbarMessage.value = "$cleanName registered with code $cleanCode!"
         onComplete()
       }.onFailure { e ->
-        _snackbarMessage.value = e.localizedMessage ?: "Failed to pair device"
+        _snackbarMessage.value = e.localizedMessage ?: "Failed to register device"
       }
     }
   }
